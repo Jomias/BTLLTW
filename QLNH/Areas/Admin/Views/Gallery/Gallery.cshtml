@@ -1,0 +1,218 @@
+﻿@{
+    ViewData["Title"] = "Gallery";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles{
+    <link href="/Admin/vendor/datatables/css/jquery.dataTables.min.css" rel="stylesheet">
+}
+<div class="content-body" style="min-height: 960px">
+    <div class="container-fluid">
+        <div class="row page-titles mx-0">
+            <div class="col-sm-6 p-md-0">
+                <div class="welcome-text">
+                    <h4>Hi, Welcome Back!</h4>
+                </div>
+            </div>
+            <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Quản lý ảnh trưng bày</a></li>
+                    <li class="breadcrumb-item active"><a href="javascript:void(0)">Danh mục</a></li>
+                </ol>
+            </div>
+            <!-- row -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Danh sách danh mục</h4>
+                            <button type="button" id="addGalleryBtn" class="btn btn-primary float-right" data-toggle="modal" data-target="#addEditGalleryModal">Add Gallery</button>
+
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table id="data_table" class="display text-center" style="min-width: 845px">
+                                    <thead>
+                                        <tr>
+                                            <th>STT</th>
+                                            <th>Id</th>
+                                            <th>Name</th>
+                                            <th>Slug</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gallery_data">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add/Edit Gallery Modal -->
+        <div class="modal fade" id="addEditGalleryModal" tabindex="-1" role="dialog" aria-labelledby="addEditGalleryModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered " role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addEditGalleryModalLabel">Add Gallery</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form id="galleryForm">
+                        <div class="modal-body">
+                            <input type="hidden" id="galleryId" name="id" value="">
+                            <div class="form-group">
+                                <label for="galleryName">Name</label>
+                                <span class="text-danger"> *</span>
+                                <input type="text" class="form-control" id="galleryName" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="gallerySlug">Slug</label>
+                                <input type="text" class="form-control" id="gallerySlug" name="slug" required>
+                            </div>
+                            <input type="hidden" id="galleryCreatedAt" name="createdAt">
+                            <input type="hidden" id="galleryUpdatedBy" name="updatedBy">
+                            <input type="hidden" id="galleryUpdatedAt" name="updatedAt">
+                            <input type="hidden" id="galleryStatus" name="status">
+                            <input type="hidden" id="galleryIsDeleted" name="isDeleted">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" id="saveGalleryBtn" class="btn btn-primary">Save Gallery</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Success modal -->
+        @await Html.PartialAsync("_SuccessModalPartial")
+
+        <!-- Error modal -->
+        @await Html.PartialAsync("_ErrorModalPartial")
+    </div>
+</div>
+
+
+
+@section Scripts{
+    <!-- Datatable -->
+    <script src="/Admin/vendor/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="/Admin/js/plugins-init/datatables.init.js"></script>
+
+    <script type="text/javascript">
+        function getData() {
+            $.ajax({
+                url: "/api/AGallery",
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    $('#gallery_data').html('');
+                    data.forEach(function (item, index) {
+                        let row = `<tr>
+                                                <td>${index + 1}</td>
+                                                <td>${item.Id}</td>
+                                                <td>${item.Name}</td>
+                                                <td>${item.Slug}</td>
+                                                <td>
+                                                    <div class="dropdown">
+                                                        <button type="button" class="btn btn-success light sharp" data-toggle="dropdown">
+                                                            <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="5" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="19" cy="12" r="2"></circle></g></svg>
+                                                        </button>
+                                                        <div class="dropdown-menu">
+                                                            <a class="dropdown-item edit-gallery" data-id="${item.Id}" href="#">Edit</a>
+                                                            <a class="dropdown-item delete-gallery" data-id="${item.Id}" href="#">Delete</a>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                           </tr>`;
+                        $('#gallery_data').append(row);
+                    });
+                    $('#data_table').DataTable();
+                },
+                error: function () {
+                },
+                complete: function () {
+                }
+            });
+        }
+        $(document).ready(function () {
+
+            $('#addGalleryBtn').click(function () {
+                $('#addEditGalleryModalLabel').text('Add Gallery');
+                $('#galleryForm')[0].reset();
+                $("input[type='hidden']").val('');
+            });
+            getData();
+            // Edit gallery click event
+            $('#data_table tbody').on('click', '.edit-gallery', function () {
+                $('#galleryForm')[0].reset();
+                var galleryId = $(this).data('id');
+                $.ajax({
+                    url: '/api/AGallery/' + galleryId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (gallery) {
+                        $('#addEditGalleryModalLabel').text('Edit Gallery');
+                        $('#galleryId').val(gallery.Id);
+                        $('#galleryName').val(gallery.Name);
+                        $('#gallerySlug').val(gallery.Slug);
+                        $('#galleryCreatedAt').val(gallery.CreatedAt);
+                        $('#galleryUpdatedAt').val(gallery.UpdatedAt);
+                        $('#galleryStatus').val(gallery.Status);
+                        $('#galleryIsDeleted').val(gallery.IsDeleted);
+                        $('#addEditGalleryModal').modal('show');
+                    },
+                    error: function () {
+                        $('#errorModal').modal('show');
+                    }
+                });
+            });
+            // Delete gallery click event
+            $('#data_table tbody').on('click', '.delete-gallery', function () {
+                var galleryId = $(this).data('id');
+                $.ajax({
+                    url: '/api/AGallery/' + galleryId,
+                    type: 'DELETE',
+                    dataType: 'json',
+                    success: function () {
+                        $('#successModal').modal('show');
+                        getData();
+                    },
+                    error: function () {
+                        $('#errorModal').modal('show');
+                    }
+                });
+            });
+            // Save Gallery
+            $('#saveGalleryBtn').click(function () {
+                event.preventDefault();
+                var galleryData = $('#galleryForm').serialize();
+                var method = $('#galleryId').val() ? 'PUT' : 'POST';
+                console.log(galleryData);
+                $.ajax({
+                    url: '/api/AGallery/',
+                    type: method,
+                    data: galleryData,
+                    dataType: 'json',
+                    success: function () {
+                        $('#addEditGalleryModal').modal('hide');
+                        $('#successModal').modal('show');
+                        getData();
+                    },
+                    error: function (error) {
+                        $('#addEditGalleryModal').modal('hide');
+
+                        $('#errorModal').modal('show');
+                    }
+                });
+            });
+        });
+    </script>
+
+}
+

@@ -1,0 +1,211 @@
+﻿@{
+    ViewData["Title"] = "Position";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles{
+    <link href="/Admin/vendor/datatables/css/jquery.dataTables.min.css" rel="stylesheet">
+}
+<div class="content-body" style="min-height: 960px">
+    <div class="container-fluid">
+        <div class="row page-titles mx-0">
+            <div class="col-sm-6 p-md-0">
+                <div class="welcome-text">
+                    <h4>Hi, Welcome Back!</h4>
+                </div>
+            </div>
+            <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Quản lý nhân viên</a></li>
+                    <li class="breadcrumb-item active"><a href="javascript:void(0)">Vị trí</a></li>
+                </ol>
+            </div>
+            <!-- row -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Danh sách vị trí</h4>
+                            <button type="button" id="addPositionBtn" class="btn btn-primary float-right" data-toggle="modal" data-target="#addEditPositionModal">Add Position</button>
+
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table id="data_table" class="display text-center" style="min-width: 845px">
+                                    <thead>
+                                        <tr>
+                                            <th>STT</th>
+                                            <th>Id</th>
+                                            <th>Name</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="position_data">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add/Edit Position Modal -->
+        <div class="modal fade" id="addEditPositionModal" tabindex="-1" role="dialog" aria-labelledby="addEditPositionModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered " role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addEditPositionModalLabel">Add Position</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form id="positionForm">
+                        <div class="modal-body">
+                            <input type="hidden" id="positionId" name="id" value="">
+                            <div class="form-group">
+                                <label for="positionName">Name</label>
+                                <input type="text" class="form-control" id="positionName" name="name" required>
+                            </div>
+                            <input type="hidden" id="positionCreatedBy" name="createdBy">
+                            <input type="hidden" id="positionCreatedAt" name="createdAt">
+                            <input type="hidden" id="positionUpdatedBy" name="updatedBy">
+                            <input type="hidden" id="positionUpdatedAt" name="updatedAt">
+                            <input type="hidden" id="positionStatus" name="status">
+                            <input type="hidden" id="positionIsDeleted" name="isDeleted">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" id="savePositionBtn" class="btn btn-primary">Save Position</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Success modal -->
+        @await Html.PartialAsync("_SuccessModalPartial")
+
+        <!-- Error modal -->
+        @await Html.PartialAsync("_ErrorModalPartial")
+    </div>
+</div>
+
+
+
+@section Scripts{
+    <!-- Datatable -->
+    <script src="/Admin/vendor/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="/Admin/js/plugins-init/datatables.init.js"></script>
+
+    <script type="text/javascript">
+        function getData() {
+            // Fetch data using AJAX
+            $.ajax({
+                url: "/api/APosition",
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    $('#position_data').html('');
+                    data.forEach(function (item, index) {
+                        let row = `<tr>
+                                        <td>${index + 1}</td>
+                                        <td>${item.Id}</td>
+                                        <td>${item.Name}</td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <button type="button" class="btn btn-success light sharp" data-toggle="dropdown">
+                                                    <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="5" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="19" cy="12" r="2"></circle></g></svg>
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    <a class="dropdown-item edit-position" data-id="${item.Id}" href="#">Edit</a>
+                                                    <a class="dropdown-item delete-position" data-id="${item.Id}" href="#">Delete</a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                   </tr>`;
+                        $('#position_data').append(row);
+                    });
+                    $('#data_table').DataTable();
+                },
+                error: function () {
+                },
+                complete: function () {
+                }
+            });
+        }
+        $(document).ready(function () {
+            $('#addPositionBtn').click(function () {
+                $('#addEditPositionModalLabel').text('Add Position');
+                $('#positionForm')[0].reset();
+                $("input[type='hidden']").val('');
+            });
+            getData();
+            // Edit position click event
+            $('#data_table tbody').on('click', '.edit-position', function () {
+                $('#positionForm')[0].reset();
+                var positionId = $(this).data('id');
+                console.log(positionId);
+                $.ajax({
+                    url: '/api/APosition/' + positionId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (position) {
+                        $('#addEditPositionModalLabel').text('Edit Position');
+                        $('#positionId').val(position.Id);
+                        $('#positionName').val(position.Name);
+                        $('#positionCreatedBy').val(position.CreatedBy);
+                        $('#positionCreatedAt').val(position.CreatedAt);
+                        $('#positionUpdatedBy').val(position.UpdatedBy);
+                        $('#positionUpdatedAt').val(position.UpdatedAt);
+                        $('#positionStatus').val(position.Status);
+                        $('#positionIsDeleted').val(position.IsDeleted);
+                        $('#addEditPositionModal').modal('show');
+                    },
+                    error: function () {
+                        $('#errorModal').modal('show');
+                    }
+                });
+            });
+            // Delete position click event
+            $('#data_table tbody').on('click', '.delete-position', function () {
+                var positionId = $(this).data('id');
+                $.ajax({
+                    url: '/api/APosition/' + positionId,
+                    type: 'DELETE',
+                    dataType: 'json',
+                    success: function () {
+                        $('#successModal').modal('show');
+                        getData();
+                    },
+                    error: function () {
+                        $('#errorModal').modal('show');
+                    }
+                });
+            });
+            // Save Position
+            $('#savePositionBtn').click(function () {
+                var positionData = $('#positionForm').serialize();
+                var method = $('#positionId').val() ? 'PUT' : 'POST';
+                console.log(positionData);
+                $.ajax({
+                    url: '/api/APosition/',
+                    type: method,
+                    data: positionData,
+                    dataType: 'json',
+                    success: function () {
+                        $('#addEditPositionModal').modal('hide');
+                        $('#successModal').modal('show');
+                        getData();
+                    },
+                    error: function (error) {
+                        $('#errorModal').modal('show'); 
+                    }
+                });
+            });
+        });
+    </script>
+
+}
+

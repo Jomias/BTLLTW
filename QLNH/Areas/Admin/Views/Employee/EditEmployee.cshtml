@@ -1,0 +1,154 @@
+﻿@model QLNH.Models.EmployeeModel
+
+@{
+    ViewData["Title"] = "AddEmployee";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-body" style="min-height: 960px">
+    <div class="container-fluid">
+        <div class="row page-titles mx-0">
+            <div class="col-sm-6 p-md-0">
+                <div class="welcome-text">
+                    <h4>Hi, Welcome Back!</h4>
+                </div>
+            </div>
+            <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Quản lý nhân viên</a></li>
+                    <li class="breadcrumb-item active"><a href="javascript:void(0)">Sửa nhân viên</a></li>
+                </ol>
+            </div>
+            <!-- row -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Sửa nhân viên</h4>
+                        </div>
+                        <div class="card-body">
+                            <form id="form-employee" asp-area="Admin" asp-controller="Employee" asp-action="EditEmployee" method="post">
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <input type="hidden" asp-for="Id" />
+                                <input type="hidden" asp-for="Avatar" />
+                                <input type="hidden" asp-for="CreatedBy" />
+                                <input type="hidden" asp-for="CreatedAt" />
+                                <input type="hidden" asp-for="UpdatedBy" />
+                                <input type="hidden" asp-for="UpdatedAt" />
+                                <input type="hidden" asp-for="Status" />
+                                <input type="hidden" asp-for="IsDeleted" />
+
+                                <div class="form-group">
+                                    <label asp-for="FirstName" class="control-label"></label>
+                                    <span class="text-danger">*</span>
+                                    <input asp-for="FirstName" class="form-control" />
+                                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="LastName" class="control-label"></label>
+                                    <span class="text-danger">*</span>
+                                    <input asp-for="LastName" class="form-control" />
+                                    <span asp-validation-for="LastName" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Description" class="control-label"></label>
+                                    <input asp-for="Description" class="form-control" />
+                                    <span asp-validation-for="Description" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="PositionId" class="control-label"></label>
+                                    <span class="text-danger">*</span>
+                                    <select id="positionId" name="PositionId" class="form-control"></select>
+                                    <span asp-validation-for="PositionId" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" asp-for="AvatarFile">  </label>
+                                    <div class="col-md-12 text-center">
+                                        <img src="@Url.Content(Model.Avatar)" id="image-upload" class="rounded mx-auto d-block" style="width: 256px" />
+                                    </div>
+                                    <input type="file" class="form-control" asp-for="AvatarFile" id="exampleInputFile">
+                                    <span asp-validation-for="AvatarFile" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <button onclick="callAPI(event);" class="btn btn-primary">
+                                        Submit
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="card-footer">
+                            <div>
+                                <a href="/Admin/Employee/Index">Back to List</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("_SuccessModalPartial")
+@await Html.PartialAsync("_ErrorModalPartial")
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('#exampleInputFile').change(function () {
+                var input = this;
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#image-upload').attr('src', e.target.result);
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            });
+        });
+
+        $(window).on('load', function () {
+            $.ajax({
+                type: 'GET',
+                url: '/api/APosition',
+                dataType: 'json',
+                success: function (positions) {
+                    var select = $('#positionId').selectpicker();
+                    $.each(positions, function (i, position) {
+                        let row = `<option value="${position.Id}">${position.Name}</option>`;
+                        if (@Model.PositionId == position.Id) {
+                            row = `<option value="${position.Id}" selected>${position.Name}</option>`;
+                        } 
+
+                        select.append(row);
+                    });
+                    select.selectpicker('refresh');
+                },
+                error: function (xhr, status, error) {
+                    console.log(error);
+                }
+            });
+        });
+        function callAPI(event) {
+            event.preventDefault();
+            var formData = new FormData($('#form-employee')[0]);
+            $.ajax({
+                type: 'PUT',
+                url: '/api/AEmployee',
+                dataType: 'json',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (result) {
+                    $('#successModal').modal('show');
+                    setTimeout(function () {
+                        window.location.href = '/Admin/Employee/Index';
+                    }, 500);
+                },
+                error: function (xhr, status, error) {
+                    console.log(error);
+                }
+            });
+        }
+
+    </script>
+}

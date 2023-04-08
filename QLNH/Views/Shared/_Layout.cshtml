@@ -1,0 +1,72 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Home</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--===============================================================================================-->
+	<link rel="icon" type="image/png" href="/Climages/icons/favicon.png" />
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="/Client/vendor/bootstrap/css/bootstrap.min.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="/Client/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="/Client/fonts/themify/themify-icons.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="/Client/vendor/animate/animate.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="/Client/vendor/css-hamburgers/hamburgers.min.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="/Client/vendor/animsition/css/animsition.min.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="/Client/vendor/select2/select2.min.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="/Client/vendor/daterangepicker/daterangepicker.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="/Client/vendor/slick/slick.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="/Client/vendor/lightbox2/css/lightbox.min.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="/Client/css/util.css">
+	<link rel="stylesheet" type="text/css" href="/Client/css/main.css">
+	<!--===============================================================================================-->
+</head>
+<body class="animsition">
+
+	@await Html.PartialAsync("_HeaderPartial")
+
+	@RenderBody()
+
+	@await Html.PartialAsync("_FooterPartial")
+
+
+	<!--===============================================================================================-->
+	<script type="text/javascript" src="/Client/vendor/jquery/jquery-3.2.1.min.js"></script>
+	<!--===============================================================================================-->
+	<script type="text/javascript" src="/Client/vendor/animsition/js/animsition.min.js"></script>
+	<!--===============================================================================================-->
+	<script type="text/javascript" src="/Client/vendor/bootstrap/js/popper.js"></script>
+	<script type="text/javascript" src="/Client/vendor/bootstrap/js/bootstrap.min.js"></script>
+	<!--===============================================================================================-->
+	<script type="text/javascript" src="/Client/vendor/select2/select2.min.js"></script>
+	<!--===============================================================================================-->
+	<script type="text/javascript" src="/Client/vendor/daterangepicker/moment.min.js"></script>
+	<script type="text/javascript" src="/Client/vendor/daterangepicker/daterangepicker.js"></script>
+	<!--===============================================================================================-->
+	<script type="text/javascript" src="/Client/vendor/slick/slick.min.js"></script>
+	<script type="text/javascript" src="/Client/js/slick-custom.js"></script>
+	<!--===============================================================================================-->
+	<script type="text/javascript" src="/Client/vendor/parallax100/parallax100.js"></script>
+	<script type="text/javascript">
+		$('.parallax100').parallax100();
+	</script>
+	<!--===============================================================================================-->
+	<script type="text/javascript" src="/Client/vendor/countdowntime/countdowntime.js"></script>
+	<!--===============================================================================================-->
+	<script type="text/javascript" src="/Client/vendor/lightbox2/js/lightbox.min.js"></script>
+	<!--===============================================================================================-->
+	<script src="/Client/js/main.js"></script>
+	@RenderSection("Scripts", required: false)
+</body>
+</html>
