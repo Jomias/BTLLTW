@@ -30,7 +30,7 @@ namespace QLNH.Apis
 			}
 		}
 
-		[HttpGet]
+        [HttpGet]
 		public async Task<IActionResult> GetAll()
 		{
 			try

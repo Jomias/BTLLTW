@@ -71,20 +71,21 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form id="galleryImageForm" enctype="multipart/form-data">
+                    <form id="galleryImageForm">
                         <div class="modal-body">
                             <input type="hidden" id="galleryImageId" name="Id" value="">
-                            <input type="hidden" id="galleryImageName" name="Name" value="">
+                            <input type="hidden" id="galleryImageName" name="Name">
+                            <input type="hidden" id="galleryImagePath" name="Path">
                             <input type="hidden" id="galleryImageCreatedBy" name="CreatedBy">
-                            <input type="hidden" id="galleryImageCreatedAt" name="createdAt">
-                            <input type="hidden" id="galleryImageUpdatedBy" name="updatedBy">
-                            <input type="hidden" id="galleryImageUpdatedAt" name="updatedAt">
-                            <input type="hidden" id="galleryImageStatus" name="status">
-                            <input type="hidden" id="galleryImageIsDeleted" name="isDeleted">
+                            <input type="hidden" id="galleryImageCreatedAt" name="CreatedAt">
+                            <input type="hidden" id="galleryImageUpdatedBy" name="UpdatedBy">
+                            <input type="hidden" id="galleryImageUpdatedAt" name="UpdatedAt">
+                            <input type="hidden" id="galleryImageStatus" name="Status">
+                            <input type="hidden" id="galleryImageIsDeleted" name="IsDeleted">
                             <div class="form-group">
                                 <label for="GalleryId" class="control-label">Danh mục</label>
                                 <span class="text-danger">*</span>
-                                <select id="galleryOption" name="GalleryId" class="form-control"></select>
+                                <select id="galleryOption" name="galleryId" class="form-control"></select>
                             </div>
                             <div class="form-group">
                                 <label for="galleryImageFile">Image</label>
@@ -118,6 +119,10 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
+            $('#galleryOption').on('change', function () {
+                var selectedGalleryId = $(this).val();
+                $('#galleryImageForm input[name="GalleryId"]').val(selectedGalleryId);
+            });
             $.ajax({
                 type: 'GET',
                 url: '/api/AGallery',
@@ -140,12 +145,13 @@
                 url: '/api/AGallery',
                 dataType: 'json',
                 success: function (galleries) {
-                    var select = $('#galleryOption').selectpicker();
+                    $('#galleryOption').html('');
+                    var select = $('#galleryOption');
+                    console.log(galleries);
                     $.each(galleries, function (i, gallery) {
                         let row = `<option value="${gallery.Id}">${gallery.Name}</option>`;
                         if ((i === 0 && GalleryId === null) || GalleryId === gallery.Id) {
                             row = `<option value="${gallery.Id}" selected>${gallery.Name}</option>`;
-
                         }
                         select.append(row);
                     });
@@ -214,6 +220,8 @@
                 $('#addEditGalleryImageModalLabel').text('Add GalleryImage');
                 $('#galleryImageForm')[0].reset();
                 $("input[type='hidden']").val('');
+                $('#image-upload').attr('src', '');
+                modalGalleryImageListGallery();
             });
             getData();
             // Edit galleryImage click event
@@ -225,10 +233,10 @@
                     type: 'GET',
                     dataType: 'json',
                     success: function (galleryImage) {
-                        console.log(galleryImage);
                         $('#addEditGalleryImageModalLabel').text('Edit GalleryImage');
                         $('#galleryImageId').val(galleryImage.Id);
                         $('#galleryImageName').val(galleryImage.Name);
+                        $('#galleryImagePath').val(galleryImage.Path);
                         $('#galleryImageCreatedBy').val(galleryImage.CreatedBy);
                         $('#galleryImageUpdatedBy').val(galleryImage.UpdatedBy);
                         $('#galleryImageCreatedAt').val(galleryImage.CreatedAt);
@@ -236,8 +244,10 @@
                         $('#galleryImageStatus').val(galleryImage.Status);
                         $('#galleryImageIsDeleted').val(galleryImage.IsDeleted);
                         $('#galleryImageGalleryId').val(galleryImage.GalleryId);
+                        modalGalleryImageListGallery(galleryImage.GalleryId);
                         $('#image-upload').attr('src', galleryImage.Path);
                         $('#addEditGalleryImageModal').modal('show');
+
                     },
                     error: function () {
                         $('#errorModal').modal('show');
@@ -265,6 +275,7 @@
                 event.preventDefault();
                 var galleryImageData = new FormData($('#galleryImageForm')[0]);
                 var method = $('#galleryImageId').val() ? 'PUT' : 'POST';
+                console.log(method);
                 $.ajax({
                     url: '/api/AGalleryImage',
                     type: method,

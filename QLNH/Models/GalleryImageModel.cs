@@ -7,9 +7,8 @@ namespace QLNH.Models
     {
         public long? Id { get; set; }
         [DisplayName("Tên ảnh")]
-        [Required]
         [MaxLength(50)]
-        public string Name { get; set; } = null!;
+        public string? Name { get; set; } = null!;
         [DisplayName("Đường dẫn ảnh")]
         [MaxLength(100)]
         public string? Path { get; set; }

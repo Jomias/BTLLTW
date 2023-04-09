@@ -156,27 +156,27 @@
                 success: function (data) {
                     data.forEach(function (item, index) {
                         let row = ` <div class="col-md-8 col-lg-4 m-l-r-auto p-b-30">
-                                <!-- -Block5 -->
-                                <div class="blo5 pos-relative p-t-60">
-                                    <div class="pic-blo5 size14 bo4 wrap-cir-pic hov-img-zoom ab-c-t">
-                                        <a href="#"><img src="${item.Avatar}" alt="IMG-AVATAR"></a>
-                                    </div>
+                                        <!-- -Block5 -->
+                                        <div class="blo5 pos-relative p-t-60">
+                                            <div class="pic-blo5 size14 bo4 wrap-cir-pic hov-img-zoom ab-c-t">
+                                                <a href="#"><img src="${item.Avatar}" alt="IMG-AVATAR"></a>
+                                            </div>
 
-                                    <div class="text-blo5 size34 t-center bo-rad-10 bo7 p-t-90 p-l-35 p-r-35 p-b-30">
-                                        <a href="#" class="txt34 dis-block p-b-6">
-                                            ${item.Name}
-                                        </a>
+                                            <div class="text-blo5 size34 t-center bo-rad-10 bo7 p-t-90 p-l-35 p-r-35 p-b-30">
+                                                <a href="#" class="txt34 dis-block p-b-6">
+                                                    ${item.Name}
+                                                </a>
 
-                                        <span class="dis-block t-center txt35 p-b-25">
-                                            ${item.Position}
-                                        </span>
+                                                <span class="dis-block t-center txt35 p-b-25">
+                                                    ${item.Position}
+                                                </span>
 
-                                        <p class="t-center">
-                                            ${item.Description}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>`;
+                                                <p class="t-center">
+                                                    ${item.Description}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>`;
                         $('#chef').append(row);
                     });
 
@@ -187,5 +187,6 @@
                 }
             });
         });
+
     </script>
 }

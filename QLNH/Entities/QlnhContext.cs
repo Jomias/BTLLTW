@@ -52,6 +52,7 @@ public partial class QlnhContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Data Source=LAPTOP-C6RJADBP;Initial Catalog=QLNH;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -276,11 +277,10 @@ public partial class QlnhContext : DbContext
                 .HasColumnType("money");
             entity.Property(e => e.Quantity).HasDefaultValueSql("((0))");
             entity.Property(e => e.Slug).HasMaxLength(100);
+            entity.Property(e => e.Status).HasDefaultValueSql("((0))");
             entity.Property(e => e.Summary).HasMaxLength(50);
             entity.Property(e => e.Unit).HasMaxLength(20);
-            entity.Property(e => e.UpdatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
+            entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
             entity.Property(e => e.UpdatedBy)
                 .HasMaxLength(30)
                 .IsUnicode(false);

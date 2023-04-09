@@ -84,7 +84,8 @@ namespace QLNH.Repositories
                                   Id = a.Id,
 								  Name = a.Name,
 								  Path = a.Path,
-								  Gallery = b.Name
+								  Gallery = b.Name,
+								  Slug = b.Slug
                               }).ToListAsync();
             return temp;
         }

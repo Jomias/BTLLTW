@@ -11,6 +11,5 @@ namespace QLNH.Repositories.Interfaces
 		public Task DeleteAsync(long id);
 		public Task<List<GalleryImageModel>> GetAllAsync();
         public Task<List<GalleryImageViewModel>> GetAllGalleryImageViewModel(long? positionId);
-
     }
 }
