@@ -55,16 +55,16 @@ namespace QLNH.Repositories
 
 		public async Task<EmployeeModel> GetAsync(long id)
 		{
-			var Employees = await _context.Positions!.SingleOrDefaultAsync(p => p.Id == id && p.IsDeleted == false);
-            return _mapper.Map<EmployeeModel>(Employees);
+			var Employee = await _context.Employees!.SingleOrDefaultAsync(p => p.Id == id && p.IsDeleted == false);
+            return _mapper.Map<EmployeeModel>(Employee);
 		}
 
-		public async Task<List<EmployeeViewModel>> GetAllEmployeeViewModel(long? galleryId)
+		public async Task<List<EmployeeViewModel>> GetAllEmployeeViewModel(long? positionId)
 		{
 			var temp = await (from a in _context.Employees
 							 join b in _context.Positions on a.PositionId equals b.Id
 							 where a.IsDeleted == false && b.IsDeleted == false
-							 where galleryId == null || a.PositionId == galleryId
+							 where positionId == null || a.PositionId == positionId
 							 select new EmployeeViewModel()
 							 {
 								 Id = a.Id,

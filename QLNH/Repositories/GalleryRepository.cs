@@ -16,6 +16,7 @@ namespace QLNH.Repositories
         {
             _context = context;
 			_mapper = mapper;
+			_mapper = mapper;
         }
         public async Task<long> AddAsync(GalleryModel model)
 		{
@@ -42,8 +43,8 @@ namespace QLNH.Repositories
 
 		public async Task<List<GalleryModel>> GetAllAsync()
 		{
-            var gallerys = await _context.Galleries!.Where(x => x.IsDeleted == false).ToListAsync();
-            return _mapper.Map<List<GalleryModel>>(gallerys);
+            var galleries = await _context.Galleries!.Where(x => x.IsDeleted == false).ToListAsync();
+            return _mapper.Map<List<GalleryModel>>(galleries);
 		}
 
 		public async Task<GalleryModel> GetAsync(long id)

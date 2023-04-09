@@ -14,6 +14,8 @@ namespace QLNH.Helpers
 			CreateMap<Employee, EmployeeModel>().ReverseMap();
             CreateMap<Gallery, GalleryModel>().ReverseMap();
             CreateMap<GalleryImage, GalleryImageModel>().ReverseMap();
+			CreateMap<Category, CategoryModel>().ReverseMap();
+            CreateMap<Ingredient, IngredientModel>().ReverseMap();
 
 
         }

@@ -1,0 +1,157 @@
+﻿@model QLNH.Models.IngredientModel
+
+@{
+    ViewData["Title"] = "Add Ingredient";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-body" style="min-height: 960px">
+    <div class="container-fluid">
+        <div class="row page-titles mx-0">
+            <div class="col-sm-6 p-md-0">
+                <div class="welcome-text">
+                    <h4>Hi, Welcome Back!</h4>
+                </div>
+            </div>
+            <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Quản lý Menu</a></li>
+                    <li class="breadcrumb-item active"><a href="javascript:void(0)">Thêm Nguyên liệu</a></li>
+                </ol>
+            </div>
+            <!-- row -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Thêm Nguyên liệu</h4>
+                        </div>
+                        <div class="card-body">
+                            <form id="form-ingredient" asp-area="Admin" asp-controller="Ingredient" asp-action="AddIngredient" method="post">
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="form-group">
+                                    <label asp-for="Name" class="control-label"></label>
+                                    <span class="text-danger">*</span>
+                                    <input asp-for="Name" class="form-control" />
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Slug" class="control-label"></label>
+                                    <input asp-for="Slug" class="form-control" />
+                                    <span asp-validation-for="Slug" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Price" class="control-label"></label>
+                                    <input asp-for="Price" class="form-control" />
+                                    <span asp-validation-for="Price" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Quantity" class="control-label"></label>
+                                    <input asp-for="Quantity" class="form-control" />
+                                    <span asp-validation-for="Quantity" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Unit" class="control-label"></label>
+                                    <span class="text-danger">*</span>
+                                    <input asp-for="Unit" class="form-control" />
+                                    <span asp-validation-for="Unit" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Summary" class="control-label"></label>
+                                    <input asp-for="Summary" class="form-control" />
+                                    <span asp-validation-for="Summary" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="CategoryId" class="control-label"></label>
+                                    <span class="text-danger">*</span>
+                                    <select id="categoryId" name="CategoryId" class="form-control">
+                                    </select>
+                                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" asp-for="AvatarFile">  </label>
+                                    <div class="col-md-12 text-center">
+                                        <img src="" id="image-upload" class="rounded mx-auto d-block" style="width: 256px" />
+                                    </div>
+                                    <input type="file" class="form-control" asp-for="AvatarFile" id="exampleInputFile">
+                                    <span asp-validation-for="AvatarFile" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <button onclick="callAPI(event);" class="btn btn-primary">
+                                        Submit
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="card-footer">
+                            <div>
+                                <a href="/Admin/Ingredient/Index">Back to List</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("_SuccessModalPartial")
+@await Html.PartialAsync("_ErrorModalPartial")
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('#exampleInputFile').change(function () {
+                var input = this;
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#image-upload').attr('src', e.target.result);
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            });
+        });
+
+        $(window).on('load', function () {
+            $.ajax({
+                type: 'GET',
+                url: '/api/ACategory',
+                dataType: 'json',
+                success: function (categories) {
+                    var select = $('#categoryId').selectpicker();
+                    $.each(categories, function (i, category) {
+                        let row =`<option value="${category.Id}">${category.Name}</option>`;
+                        select.append(row);
+                    });
+                    select.selectpicker('refresh');
+                },
+                error: function (xhr, status, error) {
+                    console.log(error);
+                }
+            });
+        });
+        function callAPI(event) {
+            event.preventDefault();
+            var formData = new FormData($('#form-ingredient')[0]);
+            $.ajax({
+                type: 'POST',
+                url: '/api/AIngredient',
+                dataType: 'json',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (result) {
+                    $('#successModal').modal('show');
+                    setTimeout(function () {
+                        window.location.href = '/Admin/Ingredient/Index';
+                    }, 500);
+                },
+                error: function (xhr, status, error) {
+                    $('#form-ingredient').submit();
+                }
+            });
+        }
+
+    </script>
+}

@@ -108,6 +108,7 @@
                 dataType: "json",
                 success: function (data) {
                     $('#position_data').html('');
+                    $('#data_table').DataTable().clear().destroy();
                     data.forEach(function (item, index) {
                         let row = `<tr>
                                         <td>${index + 1}</td>
