@@ -19,12 +19,15 @@ builder.Services.AddControllersWithViews()
 
 var connectionString = builder.Configuration.GetConnectionString("QlnhContext");
 builder.Services.AddDbContext<QlnhContext>(x => x.UseSqlServer(connectionString));
+
 builder.Services.AddScoped<IDishRepository, DishRepository>();
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<IPositionRepository, PositionRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IGalleryRepository, GalleryRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IMenuRepository, MenuRepository>();
+builder.Services.AddScoped<IMenuDishRepository, MenuDishRepository>();
 builder.Services.AddScoped<IIngredientRepository, IngredientRepository>();
 builder.Services.AddScoped<IGalleryImageRepository, GalleryImageRepository>();
 
