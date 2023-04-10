@@ -11,5 +11,7 @@ namespace QLNH.Repositories.Interfaces
 		public Task DeleteAsync(long id);
 		public Task<List<DishModel>> GetAllAsync();
 		Task<List<MenuPageDishViewModel>> GetDishByMenuName(string name);
+        public Task<List<DishViewModel>> GetAllDishViewModel(long? menuId);
+
     }
 }

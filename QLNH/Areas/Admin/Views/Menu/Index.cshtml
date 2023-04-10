@@ -252,6 +252,7 @@
                     success: function () {
                         $('#successModal').modal('show');
                         getData();
+                        testMenu();
                     },
                     error: function () {
                         $('#errorModal').modal('show');
@@ -273,6 +274,7 @@
                         $('#addEditMenuModal').modal('hide');
                         $('#successModal').modal('show');
                         getData();
+                        testMenu();
                     },
                     error: function (error) {
                         $('#addEditMenuModal').modal('hide');
@@ -283,19 +285,13 @@
             });
         });
 
-
-
-        $(document).ready(function () {
-            $('#menuOption').on('change', function () {
-                var selectedMenuId = $(this).val();
-                $('#menuDishForm input[name="MenuId"]').val(selectedMenuId);
-            });
+        function testMenu() {
             $.ajax({
                 type: 'GET',
                 url: '/api/AMenu',
                 dataType: 'json',
                 success: function (menus) {
-                    
+
                     $('#menuList').html('');
                     $.each(menus, function (i, menu) {
                         let row = `<a class="dropdown-item" onclick="getData1(${menu.Id}, '${menu.Name}')">${menu.Name}</a>`;
@@ -306,6 +302,14 @@
                     console.log(error);
                 }
             });
+        }
+
+        $(document).ready(function () {
+            $('#menuOption').on('change', function () {
+                var selectedMenuId = $(this).val();
+                $('#menuDishForm input[name="MenuId"]').val(selectedMenuId);
+            });
+            testMenu();
         });
         function modalMenuDishListMenu(MenuId = null) {
             $.ajax({

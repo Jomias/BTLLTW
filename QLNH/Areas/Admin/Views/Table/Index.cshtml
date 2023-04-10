@@ -1,0 +1,219 @@
+﻿@{
+    ViewData["Title"] = "Table";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles{
+    <link href="/Admin/vendor/datatables/css/jquery.dataTables.min.css" rel="stylesheet">
+}
+<div class="content-body" style="min-height: 960px">
+    <div class="container-fluid">
+        <div class="row page-titles mx-0">
+            <div class="col-sm-6 p-md-0">
+                <div class="welcome-text">
+                    <h4>Hi, Welcome Back!</h4>
+                </div>
+            </div>
+            <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Quản lý bán</a></li>
+                    <li class="breadcrumb-item active"><a href="javascript:void(0)">Quản lý bàn</a></li>
+                </ol>
+            </div>
+            <!-- row -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Danh sách bàn</h4>
+                            <button type="button" id="addTableBtn" class="btn btn-primary float-right" data-toggle="modal" data-target="#addEditTableModal">Add Table</button>
+
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table id="data_table" class="display text-center" style="min-width: 845px">
+                                    <thead>
+                                        <tr>
+                                            <th>STT</th>
+                                            <th>Number</th>
+                                            <th>Capacity</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="table_data">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add/Edit Table Modal -->
+        <div class="modal fade" id="addEditTableModal" tabindex="-1" role="dialog" aria-labelledby="addEditTableModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered " role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addEditTableModalLabel">Add Table</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form id="tableForm">
+                        <div class="modal-body">
+                            <input type="hidden" id="tableId" name="id" value="">
+                            <div class="form-group">
+                                <label for="tableNumber">Số bàn</label>
+                                <span class="text-danger"> *</span>
+                                <input type="number" class="form-control" id="tableNumber" name="number" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="tableCapacity">Số người giới hạn</label>
+                                <span class="text-danger"> *</span>
+                                <input type="number" class="form-control" id="tableCapacity" name="capacity" required>
+                            </div>
+                            <input type="hidden" id="tableCreatedBy" name="createdBy">
+                            <input type="hidden" id="tableCreatedAt" name="createdAt">
+                            <input type="hidden" id="tableUpdatedBy" name="updatedBy">
+                            <input type="hidden" id="tableUpdatedAt" name="updatedAt">
+                            <input type="hidden" id="tableStatus" name="status">
+                            <input type="hidden" id="tableIsDeleted" name="isDeleted">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" id="saveTableBtn" class="btn btn-primary">Save Table</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Success modal -->
+        @await Html.PartialAsync("_SuccessModalPartial")
+
+        <!-- Error modal -->
+        @await Html.PartialAsync("_ErrorModalPartial")
+    </div>
+</div>
+
+
+
+@section Scripts{
+    <!-- Datatable -->
+    <script src="/Admin/vendor/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="/Admin/js/plugins-init/datatables.init.js"></script>
+
+    <script type="text/javascript">
+        function getData() {
+            // Fetch data using AJAX
+            $.ajax({
+                url: "/api/ATable",
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    $('#table_data').html('');
+                    $('#data_table').DataTable().clear().destroy();
+                    data.forEach(function (item, index) {
+                        let row = `<tr>
+                                        <td>${index + 1}</td>
+                                        <td>${item.Number}</td>
+                                        <td>${item.Capacity}</td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <button type="button" class="btn btn-success light sharp" data-toggle="dropdown">
+                                                    <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="5" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="19" cy="12" r="2"></circle></g></svg>
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    <a class="dropdown-item edit-table" data-id="${item.Id}" href="#">Edit</a>
+                                                    <a class="dropdown-item delete-table" data-id="${item.Id}" href="#">Delete</a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                   </tr>`;
+                        $('#table_data').append(row);
+                    });
+                    $('#data_table').DataTable();
+                },
+                error: function () {
+                },
+                complete: function () {
+                }
+            });
+        }
+        $(document).ready(function () {
+            $('#addTableBtn').click(function () {
+                $('#addEditTableModalLabel').text('Add Table');
+                $('#tableForm')[0].reset();
+                $("input[type='hidden']").val('');
+            });
+            getData();
+            // Edit table click event
+            $('#data_table tbody').on('click', '.edit-table', function () {
+                $('#tableForm')[0].reset();
+                var tableId = $(this).data('id');
+                console.log(tableId);
+                $.ajax({
+                    url: '/api/ATable/' + tableId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (table) {
+                        $('#addEditTableModalLabel').text('Edit Table');
+                        $('#tableId').val(table.Id);
+                        $('#tableNumber').val(table.Number);
+                        $('#tableCapacity').val(table.Capacity);
+                        $('#tableCreatedBy').val(table.CreatedBy);
+                        $('#tableCreatedAt').val(table.CreatedAt);
+                        $('#tableUpdatedBy').val(table.UpdatedBy);
+                        $('#tableUpdatedAt').val(table.UpdatedAt);
+                        $('#tableStatus').val(table.Status);
+                        $('#tableIsDeleted').val(table.IsDeleted);
+                        $('#addEditTableModal').modal('show');
+                    },
+                    error: function () {
+                        $('#errorModal').modal('show');
+                    }
+                });
+            });
+            // Delete table click event
+            $('#data_table tbody').on('click', '.delete-table', function () {
+                var tableId = $(this).data('id');
+                $.ajax({
+                    url: '/api/ATable/' + tableId,
+                    type: 'DELETE',
+                    dataType: 'json',
+                    success: function () {
+                        $('#successModal').modal('show');
+                        getData();
+                    },
+                    error: function () {
+                        $('#errorModal').modal('show');
+                    }
+                });
+            });
+            // Save Table
+            $('#saveTableBtn').click(function () {
+                var tableData = $('#tableForm').serialize();
+                var method = $('#tableId').val() ? 'PUT' : 'POST';
+                console.log(tableData);
+                $.ajax({
+                    url: '/api/ATable/',
+                    type: method,
+                    data: tableData,
+                    dataType: 'json',
+                    success: function () {
+                        $('#addEditTableModal').modal('hide');
+                        $('#successModal').modal('show');
+                        getData();
+                    },
+                    error: function (error) {
+                        $('#errorModal').modal('show'); 
+                    }
+                });
+            });
+        });
+    </script>
+
+}
+

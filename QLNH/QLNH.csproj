@@ -30,6 +30,7 @@
     <Folder Include="Entities\" />
     <Folder Include="Views\Contact\" />
     <Folder Include="wwwroot\Employee\" />
+    <Folder Include="wwwroot\Uploads\" />
   </ItemGroup>
 
 </Project>

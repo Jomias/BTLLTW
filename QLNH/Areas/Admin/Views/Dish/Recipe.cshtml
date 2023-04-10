@@ -1,0 +1,267 @@
+﻿@{
+    ViewData["Title"] = "Recipe";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var dishId = (long)ViewBag.dishId;
+}
+
+@section Styles{
+    <link href="/Admin/vendor/datatables/css/jquery.dataTables.min.css" rel="stylesheet">
+}
+<div class="content-body" style="min-height: 960px">
+    <div class="container-fluid">
+        <div class="row page-titles mx-0">
+            <div class="col-sm-6 p-md-0">
+                <div class="welcome-text">
+                    <h4>Hi, Welcome Back!</h4>
+                </div>
+            </div>
+            <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Quản lý ảnh trưng bày</a></li>
+                    <li class="breadcrumb-item active"><a href="javascript:void(0)">Ảnh trưng bày</a></li>
+                </ol>
+            </div>
+
+            <!-- row -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Danh sách ảnh</h4>
+                            <button type="button" id="addRecipeBtn" class="btn btn-primary float-right" data-toggle="modal" data-target="#addEditRecipeModal">Add Recipe</button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table id="data_table" class="display text-center" style="min-width: 845px">
+                                    <thead>
+                                        <tr>
+                                            <th>STT</th>
+                                            <th>Ingredient</th>
+                                            <th>Quantity</th>
+                                            <th>Instructions</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recipe_data">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="addEditRecipeModal" tabindex="-1" role="dialog" aria-labelledby="addEditRecipeModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered " role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addEditRecipeModalLabel">Add Recipe</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form id="recipeForm">
+                        <div class="modal-body">
+                            <input type="hidden" id="recipeId" name="Id" value="">
+                            <input type="hidden" id="recipeCreatedBy" name="CreatedBy">
+                            <input type="hidden" id="recipeCreatedAt" name="CreatedAt">
+                            <input type="hidden" id="recipeUpdatedBy" name="UpdatedBy">
+                            <input type="hidden" id="recipeUpdatedAt" name="UpdatedAt">
+                            <input type="hidden" id="recipeStatus" name="Status">
+                            <input type="hidden" id="recipeIsDeleted" name="IsDeleted">
+                            <div class="form-group">
+                                <label for="recipeDishId" class="control-label">Mã món ăn</label>
+                                <span class="text-danger">*</span>
+                                <input id="recipeDishId" class="form-control" name="DishId" readonly />
+                            </div>
+                            <div class="form-group">
+                                <label for="ingredientOption">Nguyên liệu</label>
+                                <span class="text-danger">*</span>
+                                <select id="ingredientOption" name="IngredientId" class="form-control"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="recipeQuantity">Số lượng</label>
+                                <span class="text-danger">*</span>
+                                <input type="number" min="0" class="form-control" id="recipeQuantity" name="Quantity" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="recipeInstructions">Hướng dẫn</label>
+                                <input type="text" class="form-control" id="recipeInstructions" name="Instructions">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" id="saveRecipeBtn" class="btn btn-primary">Save Recipe</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success modal -->
+        @await Html.PartialAsync("_SuccessModalPartial")
+
+        <!-- Error modal -->
+        @await Html.PartialAsync("_ErrorModalPartial")
+    </div>
+</div>
+
+@section Scripts{
+    <!-- Datatable -->
+    <script src="/Admin/vendor/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="/Admin/js/plugins-init/datatables.init.js"></script>
+
+    <script type="text/javascript">
+        function getData() {
+            if (@dishId === 0) {
+                $('#data_table').DataTable();
+                return;
+            }
+            let url = "/api/ARecipe/GetAllRecipeViewModel?DishId=" + @dishId;
+
+            $.ajax({
+                url: url,
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    $('#recipe_data').html('');
+                    $('#data_table').DataTable().clear().destroy();
+                    data.forEach(function (item, index) {
+                        let row = `<tr>
+                                                        <td>${index + 1}</td>
+                                                        <td>${item.Ingredient}</td>
+                                                        <td>${item.Quantity}</td>
+                                                        <td>${item.Instructions}</td>
+                                                        <td>
+                                                            <div class="dropdown">
+                                                                <button type="button" class="btn btn-success light sharp" data-toggle="dropdown">
+                                                                    <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="5" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="19" cy="12" r="2"></circle></g></svg>
+                                                                </button>
+                                                                <div class="dropdown-menu">
+                                                                    <a class="dropdown-item edit-recipe" data-id="${item.Id}" href="#">Edit</a>
+                                                                    <a class="dropdown-item delete-recipe" data-id="${item.Id}" href="#">Delete</a>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                  </tr>`;
+                        $('#recipe_data').append(row);
+                    });
+                    $('#data_table').DataTable();
+                },
+                error: function () {
+                },
+                complete: function () {
+                }
+            });
+        }
+        function modalRecipeListIngredient(IngredientId = null) {
+            $.ajax({
+                type: 'GET',
+                url: '/api/AIngredient',
+                dataType: 'json',
+                success: function (ingredients) {
+                    $('#ingredientOption').html('');
+                    var select = $('#ingredientOption');
+                    $.each(ingredients, function (i, ingredient) {
+                        let row = `<option value="${ingredient.Id}">${ingredient.Name}</option>`;
+                        if ((i === 0 && IngredientId === null) || IngredientId === ingredient.Id) {
+                            row = `<option value="${ingredient.Id}" selected>${ingredient.Name}</option>`;
+                        }
+                        select.append(row);
+                    });
+                    select.selectpicker('refresh');
+                },
+                error: function (xhr, status, error) {
+                    console.log(error);
+                }
+            });
+        }
+        $(document).ready(function () {
+                $('#ingredientOption').on('change', function () {
+                    var selectedIngredientId = $(this).val();
+                    $('#recipeForm input[name="IngredientId"]').val(selectedIngredientId);
+                });
+            $('#addRecipeBtn').click(function () {
+                $('#addEditRecipeModalLabel').text('Add Recipe');
+                $('#recipeForm')[0].reset();
+                $("input[type='hidden']").val('');
+                $("input[name='DishId']").val('@dishId');
+                modalRecipeListIngredient();
+            });
+            getData();
+            // Edit recipe click event
+            $('#data_table tbody').on('click', '.edit-recipe', function () {
+                $('#recipeForm')[0].reset();
+                var recipeId = $(this).data('id');
+                $.ajax({
+                    url: '/api/ARecipe/' + recipeId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (recipe) {
+                        $('#addEditRecipeModalLabel').text('Edit Recipe');
+                        $('#recipeId').val(recipe.Id);
+                        $('#recipeQuantity').val(recipe.Quantity);
+                        $('#recipeInstructions').val(recipe.Instructions);
+                        $('#recipeCreatedBy').val(recipe.CreatedBy);
+                        $('#recipeUpdatedBy').val(recipe.UpdatedBy);
+                        $('#recipeCreatedAt').val(recipe.CreatedAt);
+                        $('#recipeUpdatedAt').val(recipe.UpdatedAt);
+                        $('#recipeStatus').val(recipe.Status);
+                        $('#recipeIsDeleted').val(recipe.IsDeleted);
+                        $('#recipeDishId').val(recipe.DishId);
+                        modalRecipeListIngredient(recipe.IngredientId);
+
+                        $('#addEditRecipeModal').modal('show');
+
+                    },
+                    error: function () {
+                        $('#errorModal').modal('show');
+                    }
+                });
+            });
+            // Delete recipe click event
+            $('#data_table tbody').on('click', '.delete-recipe', function () {
+                var recipeId = $(this).data('id');
+                $.ajax({
+                    url: '/api/ARecipe/' + recipeId,
+                    type: 'DELETE',
+                    dataType: 'json',
+                    success: function () {
+                        $('#successModal').modal('show');
+                        getData();
+                    },
+                    error: function () {
+                        $('#errorModal').modal('show');
+                    }
+                });
+            });
+            // Save Recipe
+            $('#saveRecipeBtn').click(function () {
+                event.preventDefault();
+                var recipeData = new FormData($('#recipeForm')[0]);
+                var method = $('#recipeId').val() ? 'PUT' : 'POST';
+                console.log(method);
+                $.ajax({
+                    url: '/api/ARecipe',
+                    type: method,
+                    dataType: 'json',
+                    data: recipeData,
+                    contentType: false,
+                    processData: false,
+                    success: function () {
+                        $('#addEditRecipeModal').modal('hide');
+                        $('#successModal').modal('show');
+                        getData();
+                    },
+                    error: function (error) {
+                        $('#addEditRecipeModal').modal('hide');
+                        $('#errorModal').modal('show');
+                    }
+                });
+            });
+        });
+    </script>
+
+}
+

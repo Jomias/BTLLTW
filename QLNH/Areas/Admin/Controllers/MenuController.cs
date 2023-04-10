@@ -9,10 +9,5 @@ namespace QLNH.Areas.Admin.Controllers
         {
             return View();
         }
-        public IActionResult Detail(long Id = 0)
-        {
-            ViewBag.Id = Id;
-            return View();
-        }
     }
 }

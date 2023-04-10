@@ -1,6 +1,8 @@
-﻿using AutoMapper;
+﻿using AppManager.Utils;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using QLNH.Entities;
+using QLNH.Helpers;
 using QLNH.Models;
 using QLNH.Models.ViewModels;
 using QLNH.Repositories.Interfaces;
@@ -11,11 +13,13 @@ namespace QLNH.Repositories
 	{
 		private readonly QlnhContext _context;
 		private readonly IMapper _mapper;
-
-		public DishRepository(QlnhContext context, IMapper mapper)
+        private readonly IFileStorageService _fileStorageService;
+        private readonly string containerName = "Dish";
+        public DishRepository(QlnhContext context, IMapper mapper, IFileStorageService fileStorageService)
 		{
 			_context = context;
 			_mapper = mapper;
+			_fileStorageService = fileStorageService;
 		}
 
 		public async Task<List<MenuPageDishViewModel>> GetDishByMenuName(string name)
@@ -38,7 +42,15 @@ namespace QLNH.Repositories
 
 		public async Task<long> AddAsync(DishModel model)
 		{
-			var newDish = _mapper.Map<Dish>(model);
+            if (model.Slug == null)
+            {
+                model.Slug = Slug.ToUrlSlug(model.Name);
+            }
+            if (model.AvatarFile != null)
+            {
+                model.Avatar = await _fileStorageService.SaveFile(containerName, model.AvatarFile);
+            }
+            var newDish = _mapper.Map<Dish>(model);
 			_context.Dishes!.Add(newDish);
 			await _context.SaveChangesAsync();
 			return newDish.Id;
@@ -46,7 +58,7 @@ namespace QLNH.Repositories
 
 		public async Task DeleteAsync(long id)
 		{
-			var deleteDish = await _context.Dishes!.SingleOrDefaultAsync(x => x.Id == id);
+            var deleteDish = await _context.Dishes!.SingleOrDefaultAsync(x => x.Id == id);
 			if (deleteDish != null)
 			{
 				deleteDish.UpdatedAt = DateTime.Now;
@@ -70,10 +82,48 @@ namespace QLNH.Repositories
 
 		public async Task UpdateAsync(DishModel model)
 		{
-			model.UpdatedAt = DateTime.Now;
+            if (model.Slug == null)
+            {
+                model.Slug = Slug.ToUrlSlug(model.Name);
+            }
+            if (model.AvatarFile != null)
+            {
+                model.Avatar = await _fileStorageService.SaveFile(containerName, model.AvatarFile);
+            }
+            model.UpdatedAt = DateTime.Now;
 			var updateDish = _mapper.Map<Dish>(model);
 			_context.Dishes!.Update(updateDish);
 			await _context.SaveChangesAsync();
 		}
-	}
+
+        public async Task<List<DishViewModel>> GetAllDishViewModel(long? menuId)
+        {
+            var dishes = await _context.Dishes
+                .Where(d => d.IsDeleted == false)
+                .Select(d => new DishViewModel
+                {
+                    Id = d.Id,
+                    Name = d.Name,
+                    Slug = d.Slug,
+                    Price = d.Price,
+                    Unit = d.Unit,
+                    Summary = d.Summary,
+                    Content = d.Content,
+                    Instructions = d.Instructions,
+                    Avatar = d.Avatar
+                })
+                .ToListAsync();
+
+            if (menuId != null)
+            {
+                dishes = dishes
+                    .Where(d => _context.MenuDishes
+                        .Any(md => md.MenuId == menuId && md.DishId == d.Id && md.IsDeleted == false))
+                    .ToList();
+            }
+
+            return dishes;
+
+        }
+    }
 }

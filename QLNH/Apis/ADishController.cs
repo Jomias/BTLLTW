@@ -14,6 +14,18 @@ namespace QLNH.Apis
     {
         private readonly IDishRepository _dishRepository;
 
+        [HttpGet("GetAllDishViewModel")]
+        public async Task<IActionResult> GetAllDishViewModel([FromQuery] long? menuId)
+        {
+            try
+            {
+                return Ok(await _dishRepository.GetAllDishViewModel(menuId));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         public ADishController(IDishRepository dishRepository)
         {
             _dishRepository = dishRepository;
@@ -77,7 +89,7 @@ namespace QLNH.Apis
             try
             {
 				await _dishRepository.UpdateAsync(model);
-				return Ok();
+				return Ok(new DishModel());
 			}
 			catch (Exception ex)
 			{
@@ -85,14 +97,13 @@ namespace QLNH.Apis
 			}
 		}
 
-		// DELETE api/<ADishController>/5
 		[HttpDelete("{id}")]
 		public async Task<IActionResult> Delete(long id)
 		{
 			try
 			{
 				await _dishRepository.DeleteAsync(id);
-				return Ok();
+				return Ok(new DishModel());
 			}
 			catch (Exception ex)
 			{

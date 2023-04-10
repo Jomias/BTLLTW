@@ -10,10 +10,9 @@ namespace QLNH.Models
 		[MaxLength(50)]
 		[DisplayName("Tên món")]
 		public string Name { get; set; } = null!;
-		[Required]
 		[MaxLength(100)]
 		[DisplayName("Đường dẫn")]
-		public string Slug { get; set; } = null!;
+		public string? Slug { get; set; }
 		[Required]
 		[DisplayName("Giá món ăn")]
 		public decimal Price { get; set; }
@@ -29,6 +28,7 @@ namespace QLNH.Models
 		public string? Instructions { get; set; }
 		[DisplayName("Ảnh đại diện")]
 		public string? Avatar { get; set; }
+        [DisplayName("Ảnh đại diện")]
         public IFormFile? AvatarFile { get; set; }
     }
 }

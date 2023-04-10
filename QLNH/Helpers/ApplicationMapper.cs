@@ -18,6 +18,8 @@ namespace QLNH.Helpers
             CreateMap<Ingredient, IngredientModel>().ReverseMap();
             CreateMap<Menu, MenuModel>().ReverseMap();
             CreateMap<MenuDish, MenuDishModel>().ReverseMap();
+            CreateMap<Recipe, RecipeModel>().ReverseMap();
+            CreateMap<Table, TableModel>().ReverseMap();
 
         }
     }

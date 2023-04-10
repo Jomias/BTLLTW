@@ -29,7 +29,9 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IMenuRepository, MenuRepository>();
 builder.Services.AddScoped<IMenuDishRepository, MenuDishRepository>();
 builder.Services.AddScoped<IIngredientRepository, IngredientRepository>();
+builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
 builder.Services.AddScoped<IGalleryImageRepository, GalleryImageRepository>();
+builder.Services.AddScoped<ITableRepository, TableRepository>();
 
 builder.Services.AddScoped<IFileStorageService, InAppStorageService>();
 

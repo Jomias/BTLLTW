@@ -1,0 +1,214 @@
+﻿@model QLNH.Models.DishModel
+
+@{
+    ViewData["Title"] = "Add Dish";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-body" style="min-height: 960px">
+    <div class="container-fluid">
+        <div class="row page-titles mx-0">
+            <div class="col-sm-6 p-md-0">
+                <div class="welcome-text">
+                    <h4>Hi, Welcome Back!</h4>
+                </div>
+            </div>
+            <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Quản lý Nguyên liệu</a></li>
+                    <li class="breadcrumb-item active"><a href="javascript:void(0)">Thêm Nguyên liệu</a></li>
+                </ol>
+            </div>
+            <!-- row -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Thêm Nguyên liệu</h4>
+                        </div>
+                        <div class="card-body">
+                            <form id="form-dish" asp-area="Admin" asp-controller="Dish" asp-action="AddDish" method="post">
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="form-group">
+                                    <label asp-for="Name" class="control-label"></label>
+                                    <span class="text-danger">*</span>
+                                    <input asp-for="Name" class="form-control" />
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Slug" class="control-label"></label>
+                                    <input asp-for="Slug" class="form-control" />
+                                    <span asp-validation-for="Slug" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Price" class="control-label"></label>
+                                    <span class="text-danger">*</span>
+                                    <input asp-for="Price" class="form-control" />
+                                    <span asp-validation-for="Price" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Unit" class="control-label"></label>
+                                    <span class="text-danger">*</span>
+                                    <input asp-for="Unit" class="form-control" />
+                                    <span asp-validation-for="Unit" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Summary" class="control-label"></label>
+                                    <input asp-for="Summary" class="form-control" />
+                                    <span asp-validation-for="Summary" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Instructions" class="control-label"></label>
+                                    <input asp-for="Instructions" class="form-control" />
+                                    <span asp-validation-for="Instructions" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" asp-for="Content"></label>
+                                    <textarea class="form-control" id="inputContent" asp-for="Content"></textarea>
+                                    <span asp-validation-for="Content" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" asp-for="AvatarFile">  </label>
+                                    <div class="col-md-12 text-center">
+                                        <img src="" id="image-upload" class="rounded mx-auto d-block" style="width: 256px" />
+                                    </div>
+                                    <input type="file" class="form-control" asp-for="AvatarFile" id="exampleInputFile">
+                                    <span asp-validation-for="AvatarFile" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <button onclick="callAPI(event);" class="btn btn-primary">
+                                        Submit
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="card-footer">
+                            <div>
+                                <a href="/Admin/Dish/Index">Back to List</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("_SuccessModalPartial")
+@await Html.PartialAsync("_ErrorModalPartial")
+
+@section Scripts{
+    <script src="/ckeditor5-build-classic/ckeditor.js"></script>
+    <script>
+        class MyUploadAdapter {
+            constructor(loader) {
+                this.loader = loader;
+            }
+
+            upload() {
+                return this.loader.file
+                    .then(file => new Promise((resolve, reject) => {
+                        this._initRequest();
+                        this._initListeners(resolve, reject, file);
+                        this._sendRequest(file);
+                    }));
+            }
+
+            abort() {
+                if (this.xhr) {
+                    this.xhr.abort();
+                }
+            }
+
+            _initRequest() {
+                const xhr = this.xhr = new XMLHttpRequest();
+                xhr.open('POST', '@Url.Action("UploadImage", "Dish", new { area = "Admin" })', true);
+                xhr.responseType = 'json';
+            }
+
+            _initListeners(resolve, reject, file) {
+                const xhr = this.xhr;
+                const loader = this.loader;
+                const genericErrorText = 'Couldn\'t upload file:' + ` ${file.name}.`;
+                xhr.addEventListener('error', () => reject(genericErrorText));
+                xhr.addEventListener('abort', () => reject());
+                xhr.addEventListener('load', () => {
+                    const response = xhr.response;
+                    if (!response || response.error) {
+                        return reject(response && response.error ? response.error.message : genericErrorText);
+                    }
+                    resolve({
+                        default: response.url
+                    });
+                });
+                if (xhr.upload) {
+                    xhr.upload.addEventListener('progress', evt => {
+                        if (evt.lengthComputable) {
+                            loader.uploadTotal = evt.total;
+                            loader.uploaded = evt.loaded;
+                        }
+                    });
+                }
+            }
+
+            _sendRequest(file) {
+                const data = new FormData();
+                data.append('upload', file);
+                this.xhr.send(data);
+            }
+        }
+
+        function MyCustomUploadAdapterPlugin(editor) {
+            editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+                return new MyUploadAdapter(loader);
+            };
+        }
+        ClassicEditor
+            .create(document.querySelector('#inputContent'), {
+                extraPlugins: [MyCustomUploadAdapterPlugin],
+                height: '600px', 
+            })
+            .then(editor => {
+                window.editor = editor;
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#exampleInputFile').change(function () {
+                var input = this;
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#image-upload').attr('src', e.target.result);
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            });
+        });
+        function callAPI(event) {
+            event.preventDefault();
+            var formData = new FormData($('#form-dish')[0]);
+            $.ajax({
+                type: 'POST',
+                url: '/api/ADish',
+                dataType: 'json',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (result) {
+                    $('#successModal').modal('show');
+                    setTimeout(function () {
+                        window.location.href = '/Admin/Dish/Index';
+                    }, 500);
+                },
+                error: function (xhr, status, error) {
+                    $('#form-dish').submit();
+                }
+            });
+        }
+
+    </script>
+}
