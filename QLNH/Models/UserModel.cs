@@ -14,9 +14,8 @@ namespace QLNH.Models
         [DisplayName("Họ")]
         public string? LastName { get; set; }
         [EmailAddress]
-        [DisplayName("Đại chỉ Email")]
+        [DisplayName("Địa chỉ Email")]
         public string Email { get; set; } = null!;
-        [EmailAddress]
         [DisplayName("Số điện thoại")]
         public string Phone { get; set; } = null!;
         [DisplayName("Thời gian đăng ký")]

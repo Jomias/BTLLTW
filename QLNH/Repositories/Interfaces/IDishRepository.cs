@@ -13,5 +13,7 @@ namespace QLNH.Repositories.Interfaces
 		public Task<List<MenuPageDishViewModel>> GetDishByMenuName(string name);
         public Task<List<DishViewModel>> GetAllDishViewModel(long? menuId);
         public Task<List<DishViewModel>> GetAllDishWithRecipeViewModel();
+        Task<List<MenuPageDishViewModel>> GetTop3DishesLastest();
+        Task<List<MenuPageDishViewModel>> GetTop3Dishes();
     }
 }

@@ -25,7 +25,8 @@ namespace QLNH.Helpers
             CreateMap<Role, RoleModel>().ReverseMap();
             CreateMap<Bill, BillModel>().ReverseMap();
             CreateMap<Order, OrderModel>().ReverseMap();
+			CreateMap<User, UserModel>().ReverseMap();
 
-        }
-    }
+		}
+	}
 }

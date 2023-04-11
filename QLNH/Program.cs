@@ -39,7 +39,8 @@ builder.Services.AddScoped<IBillRepository, BillRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 builder.Services.AddScoped<IFileStorageService, InAppStorageService>();
-
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSession();
 builder.Services.AddAutoMapper(typeof(Program));
 var app = builder.Build();
 
@@ -57,6 +58,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+app.UseSession();
 
 //app.MapControllerRoute(
 //    name: "default",

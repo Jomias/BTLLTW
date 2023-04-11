@@ -1,4 +1,10 @@
-﻿<!-- Header -->
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+	var session = HttpContextAccessor.HttpContext.Session;
+	var isLoggedIn = session.GetString("Username") != null;
+}
+<!-- Header -->
 <header>
 	<!-- Header desktop -->
 	<div class="wrap-menu-header gradient1 trans-0-4">
@@ -36,7 +42,7 @@
 							</li>
 
 							<li>
-								<a href="blog.html">Blog</a>
+								<a href="/Food/Index">Food</a>
 							</li>
 
 							<li>
@@ -48,16 +54,22 @@
 
 				<!-- Social -->
 				<div class="social flex-w flex-l-m p-r-20">
-					<a href="#"><i class="fa fa-tripadvisor" aria-hidden="true"></i></a>
-					<a href="#"><i class="fa fa-facebook m-l-21" aria-hidden="true"></i></a>
-					<a href="#"><i class="fa fa-twitter m-l-21" aria-hidden="true"></i></a>
 
+					@if (isLoggedIn)
+					{
+						<a href="/Access/Logout">Logout</a>
+					}
+					else
+					{
+						<a href="/Access/Login">Login</a>
+					}
 					<button class="btn-show-sidebar m-l-33 trans-0-4"></button>
 				</div>
 			</div>
 		</div>
 	</div>
 </header>
+
 
 <!-- Sidebar -->
 <aside class="sidebar trans-0-4">

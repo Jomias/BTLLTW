@@ -14,6 +14,30 @@ namespace QLNH.Apis
     {
         private readonly IDishRepository _dishRepository;
 
+        [HttpGet("GetTop3DishesLastest")]
+        public async Task<IActionResult> GetTop3DishesLastest()
+        {
+            try
+            {
+                return Ok(await _dishRepository.GetTop3DishesLastest());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("GetTop3Dishes")]
+        public async Task<IActionResult> GetTop3Dishes()
+        {
+            try
+            {
+                return Ok(await _dishRepository.GetTop3Dishes());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [HttpGet("GetAllDishViewModel")]
         public async Task<IActionResult> GetAllDishViewModel([FromQuery] long? menuId)
         {

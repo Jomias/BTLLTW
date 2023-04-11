@@ -36,7 +36,10 @@ namespace QLNH.Repositories
 								  Price = c.Price,
 								  Summary = c.Summary,
 								  Avatar = c.Avatar,
-							  }).ToListAsync();
+                                  Slug = c.Slug,
+                                  CreatedAt = c.CreatedAt,
+                                  CreatedBy = c.CreatedBy
+                              }).ToListAsync();
 			return temp;
 		}
 
@@ -143,6 +146,51 @@ namespace QLNH.Repositories
                     Instructions = d.Instructions,
                     Avatar = d.Avatar
                 }).ToListAsync();
+        }
+        public async Task<List<MenuPageDishViewModel>> GetTop3Dishes()
+        {
+            var dishes = await (from a in _context.Menus
+                                join b in _context.MenuDishes on a.Id equals b.MenuId
+                                join c in _context.Dishes on b.DishId equals c.Id
+                                where a.IsDeleted == false && b.IsDeleted == false && c.IsDeleted == false
+                                select new MenuPageDishViewModel()
+                                {
+                                    Id = c.Id,
+                                    Name = c.Name,
+                                    Price = c.Price,
+                                    Summary = c.Summary,
+                                    Avatar = c.Avatar,
+                                    Slug = c.Slug,
+                                    CreatedAt = c.CreatedAt,
+                                    CreatedBy = c.CreatedBy
+
+                                }).ToListAsync();
+            var top3Dishes = dishes.Take(3).ToList();
+
+            return top3Dishes;
+        }
+        public async Task<List<MenuPageDishViewModel>> GetTop3DishesLastest()
+        {
+            var dishes = await (from a in _context.Menus
+                                join b in _context.MenuDishes on a.Id equals b.MenuId
+                                join c in _context.Dishes on b.DishId equals c.Id
+                                where a.IsDeleted == false && b.IsDeleted == false && c.IsDeleted == false
+                                select new MenuPageDishViewModel()
+                                {
+                                    Id = c.Id,
+                                    Name = c.Name,
+                                    Price = c.Price,
+                                    Summary = c.Summary,
+                                    Avatar = c.Avatar,
+                                    Slug = c.Slug,
+                                    CreatedAt = c.CreatedAt,
+                                    CreatedBy = c.CreatedBy
+
+                                }).ToListAsync();
+
+            var top3Dishes = dishes.OrderByDescending(d => d.CreatedAt).Take(3).ToList();
+
+            return top3Dishes;
         }
     }
 }
