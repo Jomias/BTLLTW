@@ -2,6 +2,7 @@
     ViewData["Title"] = "Order";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
     var billId = (long)ViewBag.Id;
+    var status = (long)ViewBag.Status;
 }
 
 @section Styles{
@@ -28,8 +29,15 @@
                     <div class="card">
                         <div class="card-header">
                             <h4 class="card-title">Mã hóa đơn: @billId </h4>
-                            <button type="button" id="addOrderBtn" class="btn btn-primary float-right" data-toggle="modal" data-target="#addEditOrderModal">Add Order</button>
-                            <button type="button" id="checkOutBtn" class="btn btn-primary float-right" data-toggle="modal" data-target="#editBillModal">Check Out</button>
+                            @if(status == 0)
+                            {
+                                <button type="button" id="addOrderBtn" class="btn btn-primary float-right" data-toggle="modal" data-target="#addEditOrderModal">Add Order</button>
+                                <button type="button" id="checkOutBtn" class="btn btn-primary float-right" data-toggle="modal" data-target="#editBillModal">Check Out</button>
+                            } else
+                            {
+                                <a class="btn btn-primary float-right" href="/Admin/Bill/Invoice?BillId=@billId">See Bill</a>
+                            }
+
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -187,13 +195,7 @@
                     $('#order_data').html('');
                     $('#data_table').DataTable().clear().destroy();
                     data.forEach(function (item, index) {
-                        let row = `<tr>
-                                                        <td>${index + 1}</td>
-                                                        <td>${item.DishName}</td>
-                                                        <td>${item.Quantity}</td>
-                                                        <td>${item.Price}</td>
-                                                        <td>${item.Total}</td>
-                                                        <td>
+                        let temp=`
                                                             <div class="dropdown">
                                                                 <button type="button" class="btn btn-success light sharp" data-toggle="dropdown">
                                                                     <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="5" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="19" cy="12" r="2"></circle></g></svg>
@@ -202,7 +204,18 @@
                                                                     <a class="dropdown-item edit-order" data-id="${item.Id}" href="#">Edit</a>
                                                                     <a class="dropdown-item delete-order" data-id="${item.Id}" href="#">Delete</a>
                                                                 </div>
-                                                            </div>
+                                                            </div>`;
+                        if (@status === 1) {
+                            temp ='';
+                        }
+                        let row = `<tr>
+                                                        <td>${index + 1}</td>
+                                                        <td>${item.DishName}</td>
+                                                        <td>${item.Quantity}</td>
+                                                        <td>${item.Price}</td>
+                                                        <td>${item.Total}</td>
+                                                        <td>
+                                                            ${temp}
                                                         </td>
                                                   </tr>`;
                         $('#order_data').append(row);

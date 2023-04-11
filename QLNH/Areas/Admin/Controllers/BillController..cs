@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using QLNH.Entities;
 using QLNH.Models;
+using System.Linq;
 
 namespace QLNH.Areas.Admin.Controllers
 {
@@ -17,11 +18,26 @@ namespace QLNH.Areas.Admin.Controllers
         {
             if (billId > 0)
             {
-                ViewBag.Id = billId;
+                var item = _dbContext.Bills.Find(billId);
+                ViewBag.Id = item.Id;
+                ViewBag.Status = item.Status;
                 return View();
             }
-            var Id = _dbContext.Bills.FirstOrDefault(x => x.ReservationId == reservationId).Id;
-            ViewBag.Id = Id;
+            var temp = _dbContext.Bills.FirstOrDefault(x => x.ReservationId == reservationId);
+            ViewBag.Status = temp.Status;
+            ViewBag.Id = temp.Id;
+            return View();
+        }
+        public IActionResult Invoice(long reservationId = 0, long billId = 0)
+        {
+            if (billId > 0)
+            {
+                var item = _dbContext.Bills.Find(billId);
+                ViewBag.Id = item.Id;
+                return View();
+            }
+            var temp = _dbContext.Bills.FirstOrDefault(x => x.ReservationId == reservationId);
+            ViewBag.Id = temp.Id;
             return View();
         }
 

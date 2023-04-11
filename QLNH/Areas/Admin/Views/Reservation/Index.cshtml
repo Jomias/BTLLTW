@@ -172,7 +172,8 @@
                                                     <a class="dropdown-item edit-reservation" data-id="${item.Id}" href="#">Edit</a>
                                                     <a class="dropdown-item accept-reservation" data-id="${item.Id}" href="#" ${item.Status == 0 ? '' : 'hidden'}>Accept</a>
                                                     <a class="dropdown-item eating-reservation" data-capacity="${item.GroupOf}" data-id="${item.Id}" href="#" ${item.Status == 1 ? '' : 'hidden'}>Create Bill</a>
-                                                    <a class="dropdown-item" href="/Admin/Bill/Detail?reservationId=${item.Id}" ${item.Status == 2 ? '' : 'hidden'} }>See Bill</a>
+                                                    <a class="dropdown-item" href="/Admin/Bill/Detail?reservationId=${item.Id}" ${item.Status == 2 ? '' : 'hidden'} }>See Order</a>
+                                                    <a class="dropdown-item" href="/Admin/Bill/Invoice?reservationId=${item.Id}" ${item.Status == 3 ? '' : 'hidden'} }>See Bill</a>
                                                     <a class="dropdown-item delete-reservation" data-id="${item.Id}" href="#">Delete</a>
                                                 </div>
                                             </div>

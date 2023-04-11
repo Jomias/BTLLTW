@@ -5,43 +5,68 @@
 }
 
 @section Styles{
-    <link href="/Admin/vendor/datatables/css/jquery.dataTables.min.css" rel="stylesheet">
+
 }
-<div class="content-body" style="min-height: 960px">
+<div class="content-body">
     <div class="container-fluid">
         <div class="row page-titles mx-0">
             <div class="col-sm-6 p-md-0">
                 <div class="welcome-text">
-                    <h4>Hi, Welcome Back!</h4>
+                    <h4>Hi, welcome back!</h4>
+                    <p class="mb-0">Your business dashboard template</p>
                 </div>
             </div>
             <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">Quản lý Hóa đơn</a></li>
-                    <li class="breadcrumb-item active"><a href="javascript:void(0)">Danh sách hóa đơn</a></li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Quản lý bán</a></li>
+                    <li class="breadcrumb-item active"><a href="javascript:void(0)">Hóa đơn</a></li>
                 </ol>
             </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
 
-            <!-- row -->
-            <div class="row mt-3">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title">Danh sách hóa đơn</h4>
+                <div class="card mt-3">
+                    <div class="card-header">
+                        Invoice <strong>Mã hóa đơn: @ViewBag.Id </strong> <span class="float-right">
+                            <strong>Status:</strong> Check Out
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th class="center">#</th>
+                                        <th>Dish</th>
+                                        <th class="center">Price</th>
+                                        <th class="center">Quantity</th>
+                                        <th class="center">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="data_table">
+                                </tbody>
+                            </table>
                         </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table id="data_table" class="display text-center" style="min-width: 845px">
-                                    <thead>
+                        <div class="row">
+                            <div class="col-lg-4 col-sm-5"> </div>
+                            <div class="col-lg-4 col-sm-5 ml-auto">
+                                <table class="table table-clear">
+                                    <tbody>
                                         <tr>
-                                            <th>STT</th>
-                                            <th>Số bàn</th>
-                                            <th>Mã đặt bàn</th>
-                                            <th>Status</th>
-                                            <th></th>
+                                            <td class="left"><strong>Subtotal</strong></td>
+                                            <td id="subTotal" class="right"></td>
                                         </tr>
-                                    </thead>
-                                    <tbody id="bill_data">
+                                        <tr>
+                                            <td class="left"><strong>Discount</strong></td>
+                                            <td class="right" id="discountPercentage"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="left"><strong>Total</strong></td>
+                                            <td class="right">
+                                                <strong id="total"></strong><br>
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -50,54 +75,33 @@
                 </div>
             </div>
         </div>
-
-        <!-- Success modal -->
-        @await Html.PartialAsync("_SuccessModalPartial")
-
-        <!-- Error modal -->
-        @await Html.PartialAsync("_ErrorModalPartial")
     </div>
 </div>
 
-@section Scripts{
-    <!-- Datatable -->
-    <script src="/Admin/vendor/datatables/js/jquery.dataTables.min.js"></script>
-    <script src="/Admin/js/plugins-init/datatables.init.js"></script>
 
+@section Scripts{
+    <script src="/Admin/vendor/apexchart/apexchart.js"></script>
+    <script src="/Admin/vendor/highlightjs/highlight.pack.min.js"></script>
     <script type="text/javascript">
         function getData() {
+
+            let url = "/api/AOrder/GetAllOrderViewModel?BillId=" + @billId;
+
             $.ajax({
-                url: "/api/ABill/GetAllBillViewModel",
+                url: url,
                 type: "GET",
                 dataType: "json",
                 success: function (data) {
-                    $('#bill_data').html('');
-                    $('#data_table').DataTable().clear().destroy();
                     data.forEach(function (item, index) {
-                        let temp = `<span class="btn btn-sm light btn-warning">Eating</span>`
-                        if (item.Status === 1) {
-                            temp = `<span class="btn btn-sm light btn-primary">Done</span>`
-                        }
-                        let row = `<tr>
-                                        <td>${index + 1}</td>
-                                        <td>${item.SoBan}</td>
-                                        <td>${item.ReservationId}</td>
-                                        <td>${temp}</td>
-                                        <td>
-                                            <div class="dropdown">
-                                                <button type="button" class="btn btn-success light sharp" data-toggle="dropdown">
-                                                    <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="5" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="19" cy="12" r="2"></circle></g></svg>
-                                                </button>
-                                                <div class="dropdown-menu">
-                                                    <a class="dropdown-item" href="/Admin/Bill/Detail?BillId=${item.Id}">See Order</a>
-                                                    <a class="dropdown-item delete-bill" data-id="${item.Id}" href="#">Delete</a>
-                                                </div>
-                                            </div>
-                                        </td>
-                                  </tr>`;
-                        $('#bill_data').append(row);
+                        let row = ` <tr>
+                                        <td class="center">${index + 1}</td>
+                                        <td class="center">${item.DishName}</td>
+                                        <td class="center">$${item.Price}</td>
+                                        <td class="center">${item.Quantity}</td>
+                                        <td class="center">$${item.Total}</td>
+                                    </tr>`;
+                        $('#data_table').append(row);
                     });
-                    $('#data_table').DataTable();
                 },
                 error: function () {
                 },
@@ -107,22 +111,17 @@
         }
         $(document).ready(function () {
             getData();
-            // Delete bill click event
-            $('#data_table tbody').on('click', '.delete-bill', function () {
-                var billId = $(this).data('id');
-                $.ajax({
-                    url: '/api/ABill/' + billId,
-                    type: 'DELETE',
-                    dataType: 'json',
-                    success: function () {
-                        $('#successModal').modal('show');
-                        getData();
-                    },
-                    error: function (a) {
-                        console.log(a);
-                        $('#errorModal').modal('show');
-                    }
-                });
+            $.ajax({
+                url: '/api/ABill/' + @billId,
+                type: 'GET',
+                dataType: 'json',
+                success: function (bill) {
+                    $('#subToTal').text('$' + bill.SubTotal);
+                    $('#discountPercentage').text(bill.SubTotal + '%');
+                    $('#total').text('$' + bill.Total);
+                },
+                error: function () {
+                }
             });
         });
     </script>
