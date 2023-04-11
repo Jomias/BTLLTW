@@ -10,7 +10,7 @@ namespace QLNH.Repositories.Interfaces
 		public Task UpdateAsync(BillModel model);
 		public Task DeleteAsync(long id);
 		public Task<List<BillModel>> GetAllAsync();
-        //public Task<List<BillViewModel>> GetAllBillViewModel(long? menuId);
+        public Task<List<BillViewModel>> GetAllBillViewModel();
 
     }
 }

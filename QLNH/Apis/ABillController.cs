@@ -31,8 +31,19 @@ namespace QLNH.Apis
 				return BadRequest(ex.Message);
 			}
 		}
-
-		[HttpGet("{id}")]
+        [HttpGet("GetAllBillViewModel")]
+        public async Task<IActionResult> GetAllBillViewModel()
+        {
+            try
+            {
+                return Ok(await _dishRepository.GetAllBillViewModel());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("{id}")]
 		public async Task<IActionResult> Get(long id)
 		{
 			var dish = await _dishRepository.GetAsync(id);

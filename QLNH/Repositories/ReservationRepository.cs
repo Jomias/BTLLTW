@@ -27,7 +27,22 @@ namespace QLNH.Repositories
 		public async Task DeleteAsync(long id)
 		{
 			var deleteReservation = await _context.Reservations!.SingleOrDefaultAsync(x => x.Id == id);
-			if (deleteReservation != null) { 
+            var deleteBill = await _context.Bills!.SingleOrDefaultAsync(x => x.ReservationId == id);
+			if (deleteBill != null)
+			{
+                var table = await _context.Tables!.SingleOrDefaultAsync(x => x.Id == deleteBill.TableId);
+                if (deleteBill.Status == 0)
+                {
+                    table.Status = 0;
+                    _context.Tables.Update(table);
+                    await _context.SaveChangesAsync();
+                }
+				deleteBill.IsDeleted = true;
+				_context.Bills.Update(deleteBill);
+				await _context.SaveChangesAsync();
+            }
+			
+            if (deleteReservation != null) { 
 				deleteReservation.IsDeleted = true;
 				deleteReservation.UpdatedAt = DateTime.Now;
 				_context.Reservations!.Update(deleteReservation);
@@ -57,14 +72,6 @@ namespace QLNH.Repositories
 			_context.Reservations!.Update(updateReservation);
 			await _context.SaveChangesAsync();
 		}
-        public async Task<List<ReservationModel>> GetReservationByStatusAsync(int? status)
-        {
-            var reservations = await _context.Reservations!
-               .Where(x => x.IsDeleted == false && (status == null || x.Status == status))
-               .OrderBy(r => Math.Abs(EF.Functions.DateDiffMillisecond(r.BookingDate, DateTime.Now)))
-			   .ToListAsync();
-            return _mapper.Map<List<ReservationModel>>(reservations);
-        }
     }
 
 }

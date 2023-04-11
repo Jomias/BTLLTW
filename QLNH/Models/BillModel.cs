@@ -19,10 +19,10 @@ namespace QLNH.Models
         [DisplayName("Thời gian Thanh toán")]
         public DateTime? CheckOut { get; set; }
         [DisplayName("Mã đặt bàn")]
-        public long? ReservationId { get; set; }
+        public long ReservationId { get; set; }
         [DisplayName("Mã bàn")]
         public long TableId { get; set; }
         [DisplayName("Mã phương thức thanh toán")]
-        public long PaymentId { get; set; }
+        public long? PaymentId { get; set; }
     }
 }

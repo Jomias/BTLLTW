@@ -11,8 +11,6 @@ public partial class Reservation
 
     public DateTime BookingDate { get; set; }
 
-    public string? Request { get; set; }
-
     public string? CreatedBy { get; set; }
 
     public DateTime? CreatedAt { get; set; }

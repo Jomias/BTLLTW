@@ -36,8 +36,9 @@
                                     <thead>
                                         <tr>
                                             <th>STT</th>
-                                            <th>Number</th>
+                                            <th>Reservation Id</th>
                                             <th>Capacity</th>
+                                            <th>Booking Date</th>
                                             <th>Status</th>
                                             <th></th>
                                         </tr>
@@ -91,7 +92,36 @@
             </div>
         </div>
 
-
+        <div class="modal fade" id="addBillModal" tabindex="-1" role="dialog" aria-labelledby="addBillModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered " role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addBillModalLabel">Add Bill</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form id="billForm">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="reservationId" class="control-label">Mã đặt bàn</label>
+                                <span class="text-danger">*</span>
+                                <input id="billReservationId" class="form-control" name="ReservationId" readonly />
+                            </div>
+                            <div class="form-group">
+                                <label for="tableOption">Số bàn</label>
+                                <span class="text-danger">*</span>
+                                <select id="tableOption" name="TableId" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" id="saveBillBtn" class="btn btn-primary">Save Bill</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
         <!-- Success modal -->
         @await Html.PartialAsync("_SuccessModalPartial")
 
@@ -129,6 +159,7 @@
                         }
                         let row = `<tr>
                                         <td>${index + 1}</td>
+                                        <td>${item.Id}</td>
                                         <td>${item.GroupOf}</td>
                                         <td>${new Date(item.BookingDate).toLocaleString()}</td>
                                         <td>${temp}</td>
@@ -140,7 +171,8 @@
                                                 <div class="dropdown-menu">
                                                     <a class="dropdown-item edit-reservation" data-id="${item.Id}" href="#">Edit</a>
                                                     <a class="dropdown-item accept-reservation" data-id="${item.Id}" href="#" ${item.Status == 0 ? '' : 'hidden'}>Accept</a>
-                                                    <a class="dropdown-item eating-reservation" data-id="${item.Id}" href="#" ${item.Status == 1 ? '' : 'hidden'}>Create Bill</a>
+                                                    <a class="dropdown-item eating-reservation" data-capacity="${item.GroupOf}" data-id="${item.Id}" href="#" ${item.Status == 1 ? '' : 'hidden'}>Create Bill</a>
+                                                    <a class="dropdown-item" href="/Admin/Bill/Detail?reservationId=${item.Id}" ${item.Status == 2 ? '' : 'hidden'} }>See Bill</a>
                                                     <a class="dropdown-item delete-reservation" data-id="${item.Id}" href="#">Delete</a>
                                                 </div>
                                             </div>
@@ -194,6 +226,10 @@
 
         }
         $(document).ready(function () {
+            $('#tableOption').on('change', function () {
+                var selectedTableId = $(this).val();
+                $('#billForm input[name="TableId"]').val(selectedTableId);
+            });
             $('#addReservationBtn').click(function () {
                 $('#addEditReservationModalLabel').text('Add Reservation');
                 $('#reservationForm')[0].reset();
@@ -204,6 +240,7 @@
             $('#data_reservation tbody').on('click', '.edit-reservation', function () {
                 $('#reservationForm')[0].reset();
                 var reservationId = $(this).data('id');
+
                 $.ajax({
                     url: '/api/AReservation/' + reservationId,
                     type: 'GET',
@@ -230,6 +267,14 @@
             $('#data_reservation tbody').on('click', '.accept-reservation', function () {
                 var reservationId = $(this).data('id');
                 ChangeStatus(reservationId, 1);
+            });
+
+            $('#data_reservation tbody').on('click', '.eating-reservation', function () {
+                var reservationId = $(this).data('id');
+                var capacity = $(this).data('capacity');
+                modalBillListTable(capacity);
+                $("#billReservationId").val(reservationId);
+                $('#addBillModal').modal('show');
             });
 
             // Delete reservation click event
@@ -269,6 +314,54 @@
                 });
             });
         });
+
+
+        $('#saveBillBtn').click(function () {
+            event.preventDefault();
+            var billData = new FormData($('#billForm')[0]);
+            $.ajax({
+                url: '/api/ABill',
+                type: 'POST',
+                dataType: 'json',
+                data: billData,
+                contentType: false,
+                processData: false,
+                success: function () {
+                    $('#addBillModal').modal('hide');
+                    $('#successModal').modal('show');
+                    getData();
+
+                },
+                error: function (error) {
+                    $('#addBillModal').modal('hide');
+                    $('#errorModal').modal('show');
+                }
+            });
+        });
+
+        function modalBillListTable(capacity) {
+            $.ajax({
+                type: 'GET',
+                url: '/api/ATable/GetTableByCapacity?capacity=' + capacity,
+                dataType: 'json',
+                success: function (tables) {
+                    $('#tableOption').html('');
+                    var select = $('#tableOption');
+                    $.each(tables, function (i, table) {
+                        let row = `<option value="${table.Id}">${table.Number}</option>`;
+                        if (i === 0) {
+                            row = `<option value="${table.Id}" selected>${table.Number}</option>`;
+                        }
+                        select.append(row);
+                    });
+                    select.selectpicker('refresh');
+                },
+                error: function (xhr, status, error) {
+                    console.log(error);
+                }
+            });
+        }
+
     </script>
 
 }

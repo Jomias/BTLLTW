@@ -125,5 +125,24 @@ namespace QLNH.Repositories
             return dishes;
 
         }
+
+        public async Task<List<DishViewModel>> GetAllDishWithRecipeViewModel()
+        {
+			var temp = await _context.MenuDishes.Where(x => x.IsDeleted == false).Select(x => x.Id).Distinct().ToListAsync();
+            return await _context.Dishes.Where(x => x.IsDeleted == false && temp.Contains(x.Id))
+                .Select(d => new DishViewModel()
+                {
+
+                    Id = d.Id,
+                    Name = d.Name,
+                    Slug = d.Slug,
+                    Price = d.Price,
+                    Unit = d.Unit,
+                    Summary = d.Summary,
+                    Content = d.Content,
+                    Instructions = d.Instructions,
+                    Avatar = d.Avatar
+                }).ToListAsync();
+        }
     }
 }

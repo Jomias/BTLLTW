@@ -26,6 +26,18 @@ namespace QLNH.Apis
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("GetAllDishWithRecipeViewModel")]
+        public async Task<IActionResult> GetAllDishWithRecipeViewModel()
+        {
+            try
+            {
+                return Ok(await _dishRepository.GetAllDishWithRecipeViewModel());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         public ADishController(IDishRepository dishRepository)
         {
             _dishRepository = dishRepository;

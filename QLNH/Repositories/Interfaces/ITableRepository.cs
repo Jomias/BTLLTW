@@ -9,6 +9,6 @@ namespace QLNH.Repositories.Interfaces
 		public Task UpdateAsync(TableModel model);
 		public Task DeleteAsync(long id);
 		public Task<List<TableModel>> GetAllAsync();
-        public Task<List<TableModel>> GetTableByStatusAsync(int? status);
+        public Task<List<TableModel>> GetTableByCapacityAsync(int number);
     }
 }

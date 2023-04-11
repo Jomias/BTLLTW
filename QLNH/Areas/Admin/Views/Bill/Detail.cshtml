@@ -1,0 +1,381 @@
+﻿@{
+    ViewData["Title"] = "Order";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var billId = (long)ViewBag.Id;
+}
+
+@section Styles{
+    <link href="/Admin/vendor/datatables/css/jquery.dataTables.min.css" rel="stylesheet">
+}
+<div class="content-body" style="min-height: 960px">
+    <div class="container-fluid">
+        <div class="row page-titles mx-0">
+            <div class="col-sm-6 p-md-0">
+                <div class="welcome-text">
+                    <h4>Hi, Welcome Back!</h4>
+                </div>
+            </div>
+            <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Quản lý bán</a></li>
+                    <li class="breadcrumb-item active"><a href="javascript:void(0)">Orders</a></li>
+                </ol>
+            </div>
+
+            <!-- row -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Mã hóa đơn: @billId </h4>
+                            <button type="button" id="addOrderBtn" class="btn btn-primary float-right" data-toggle="modal" data-target="#addEditOrderModal">Add Order</button>
+                            <button type="button" id="checkOutBtn" class="btn btn-primary float-right" data-toggle="modal" data-target="#editBillModal">Check Out</button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table id="data_table" class="display text-center" style="min-width: 845px">
+                                    <thead>
+                                        <tr>
+                                            <th>STT</th>
+                                            <th>Dish</th>
+                                            <th>Quantity</th>
+                                            <th>Price</th>
+                                            <th>Total</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="order_data">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="addEditOrderModal" tabindex="-1" role="dialog" aria-labelledby="addEditOrderModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered " role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addEditOrderModalLabel">Add Order</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form id="orderForm">
+                        <div class="modal-body">
+                            <input type="hidden" id="orderId" name="Id" value="">
+                            <input type="hidden" id="orderPrice" name="Price">
+                            <input type="hidden" id="orderCreatedBy" name="CreatedBy">
+                            <input type="hidden" id="orderCreatedAt" name="CreatedAt">
+                            <input type="hidden" id="orderUpdatedBy" name="UpdatedBy">
+                            <input type="hidden" id="orderUpdatedAt" name="UpdatedAt">
+                            <input type="hidden" id="orderStatus" name="Status">
+                            <input type="hidden" id="orderIsDeleted" name="IsDeleted">
+                            <div class="form-group">
+                                <label for="orderBillId" class="control-label">Mã hóa đơn</label>
+                                <span class="text-danger">*</span>
+                                <input id="orderBillId" class="form-control" name="BillId" readonly />
+                            </div>
+                            <div class="form-group">
+                                <label for="dishOption">Món ăn</label>
+                                <span class="text-danger">*</span>
+                                <select id="dishOption" name="DishId" class="form-control"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="orderQuantity">Số lượng</label>
+                                <span class="text-danger">*</span>
+                                <input type="number" min="0" class="form-control" id="orderQuantity" name="Quantity" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="orderNote">Ghi chú</label>
+                                <input type="text" class="form-control" id="orderNote" name="Note">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" id="saveOrderBtn" class="btn btn-primary">Save Order</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="editBillModal" tabindex="-1" role="dialog" aria-labelledby="editBillModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered " role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editBillModalLabel">Check Out</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form id="billForm">
+                        <div class="modal-body">
+                            <input type="hidden" id="billSubTotal" name="SubTotal">
+                            <input type="hidden" id="billCheckIn" name="CheckIn">
+                            <input type="hidden" id="billCreatedBy" name="CreatedBy">
+                            <input type="hidden" id="billCreatedAt" name="CreatedAt">
+                            <input type="hidden" id="billUpdatedBy" name="UpdatedBy">
+                            <input type="hidden" id="billUpdatedAt" name="UpdatedAt">
+                            <input type="hidden" id="billStatus" name="Status">
+                            <input type="hidden" id="billIsDeleted" name="IsDeleted">
+                            <div class="form-group">
+                                <label for="billId" class="control-label">Mã hóa đơn</label>
+                                <span class="text-danger">*</span>
+                                <input id="billId" class="form-control" name="Id" readonly />
+                            </div>
+                            <div class="form-group">
+                                <label for="billReservationId" class="control-label">Mã đặt bàn</label>
+                                <span class="text-danger">*</span>
+                                <input id="billReservationId" class="form-control" name="ReservationId" readonly />
+                            </div>
+                            <div class="form-group">
+                                <label for="billTableId" class="control-label">Mã bàn</label>
+                                <span class="text-danger">*</span>
+                                <input id="billTableId" class="form-control" name="TableId" readonly />
+                            </div>
+                            <div class="form-group">
+                                <label for="billPaymentId">Phương thức thanh toán (Tiền mặt)</label>
+                                <span class="text-danger">*</span>
+                                <input id="billPaymentId" value="1" class="form-control" name="PaymentId" hidden/>
+                            </div>
+                            <div class="form-group">
+                                <label for="billDiscountPercentage">Phần trăm giảm giá</label>
+                                <span class="text-danger">*</span>
+                                <input id="billDiscountPercentage" class="form-control" name="DiscountPercentage" value="5" readonly />
+                            </div>
+                            <div class="form-group">
+                                <label for="billNote">Ghi chú</label>
+                                <input type="text" class="form-control" id="billNote" name="Note">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" id="saveBillBtn" class="btn btn-primary">Check out</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Success modal -->
+        @await Html.PartialAsync("_SuccessModalPartial")
+
+        <!-- Error modal -->
+        @await Html.PartialAsync("_ErrorModalPartial")
+    </div>
+</div>
+
+@section Scripts{
+    <!-- Datatable -->
+    <script src="/Admin/vendor/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="/Admin/js/plugins-init/datatables.init.js"></script>
+
+    <script type="text/javascript">
+        function getData() {
+
+            let url = "/api/AOrder/GetAllOrderViewModel?BillId=" + @billId;
+
+            $.ajax({
+                url: url,
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    $('#order_data').html('');
+                    $('#data_table').DataTable().clear().destroy();
+                    data.forEach(function (item, index) {
+                        let row = `<tr>
+                                                        <td>${index + 1}</td>
+                                                        <td>${item.DishName}</td>
+                                                        <td>${item.Quantity}</td>
+                                                        <td>${item.Price}</td>
+                                                        <td>${item.Total}</td>
+                                                        <td>
+                                                            <div class="dropdown">
+                                                                <button type="button" class="btn btn-success light sharp" data-toggle="dropdown">
+                                                                    <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="5" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="19" cy="12" r="2"></circle></g></svg>
+                                                                </button>
+                                                                <div class="dropdown-menu">
+                                                                    <a class="dropdown-item edit-order" data-id="${item.Id}" href="#">Edit</a>
+                                                                    <a class="dropdown-item delete-order" data-id="${item.Id}" href="#">Delete</a>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                  </tr>`;
+                        $('#order_data').append(row);
+                    });
+                    $('#data_table').DataTable();
+                },
+                error: function () {
+                },
+                complete: function () {
+                }
+            });
+        }
+        function modalOrderListDish(DishId = null) {
+            $.ajax({
+                type: 'GET',
+                url: '/api/ADish/GetAllDishWithRecipeViewModel',
+                dataType: 'json',
+                success: function (dishes) {
+                    $('#dishOption').html('');
+                    var select = $('#dishOption');
+                    $.each(dishes, function (i, dish) {
+                        let row = `<option value="${dish.Id}">${dish.Name}</option>`;
+                        if ((i === 0 && DishId === null) || DishId === dish.Id) {
+                            row = `<option value="${dish.Id}" selected>${dish.Name}</option>`;
+                        }
+                        select.append(row);
+                    });
+                    select.selectpicker('refresh');
+                },
+                error: function (xhr, status, error) {
+                    console.log(error);
+                }
+            });
+        }
+        $(document).ready(function () {
+            $.ajax({
+                url: '/api/ABill/' + @billId,
+                type: 'GET',
+                dataType: 'json',
+                success: function (bill) {
+                    console.log(bill)
+                    $('#addEditOrderModalLabel').text('Edit Order');
+                    $('#billCheckIn').val(bill.CheckIn);
+                    $('#billId').val(bill.Id);
+                    $('#billReservationId').val(bill.ReservationId);
+                    $('#billTableId').val(bill.TableId);
+                    $('#billNote').val(bill.Note);
+                    $('#billSubTotal').val(bill.SubTotal);
+                    $('#billQuantity').val(bill.Quantity);
+                    $('#billCreatedBy').val(bill.CreatedBy);
+                    $('#billUpdatedBy').val(bill.UpdatedBy);
+                    $('#billCreatedAt').val(bill.CreatedAt);
+                    $('#billUpdatedAt').val(bill.UpdatedAt);
+                    $('#billStatus').val(bill.Status);
+                    $('#billIsDeleted').val(bill.IsDeleted);
+                    $('#editBillModal').modal('show');
+
+                },
+                error: function () {
+                    $('#errorModal').modal('show');
+                }
+            });
+                $('#dishOption').on('change', function () {
+                    var selectedDishId = $(this).val();
+                    $('#orderForm input[name="DishId"]').val(selectedDishId);
+                });
+            $('#addOrderBtn').click(function () {
+                $('#addEditOrderModalLabel').text('Add Order');
+                $('#orderForm')[0].reset();
+                $("#orderForm input[type='hidden']").val('');
+                $("input[name='BillId']").val('@billId');
+                modalOrderListDish();
+            });
+            getData();
+            // Edit order click event
+            $('#data_table tbody').on('click', '.edit-order', function () {
+                $('#orderForm')[0].reset();
+                var orderId = $(this).data('id');
+                $.ajax({
+                    url: '/api/AOrder/' + orderId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (order) {
+                        $('#addEditOrderModalLabel').text('Edit Order');
+                        $('#orderId').val(order.Id);
+                        $('#orderPrice').val(order.Price);
+                        $('#orderNote').val(order.Note);
+                        $('#orderQuantity').val(order.Quantity);
+                        $('#orderCreatedBy').val(order.CreatedBy);
+                        $('#orderUpdatedBy').val(order.UpdatedBy);
+                        $('#orderCreatedAt').val(order.CreatedAt);
+                        $('#orderUpdatedAt').val(order.UpdatedAt);
+                        $('#orderStatus').val(order.Status);
+                        $('#orderIsDeleted').val(order.IsDeleted);
+                        $('#orderBillId').val(order.BillId);
+                        modalOrderListDish(order.DishId);
+
+                        $('#addEditOrderModal').modal('show');
+
+                    },
+                    error: function () {
+                        $('#errorModal').modal('show');
+                    }
+                });
+            });
+            // Delete order click event
+            $('#data_table tbody').on('click', '.delete-order', function () {
+                var orderId = $(this).data('id');
+                $.ajax({
+                    url: '/api/AOrder/' + orderId,
+                    type: 'DELETE',
+                    dataType: 'json',
+                    success: function () {
+                        $('#successModal').modal('show');
+                        getData();
+                    },
+                    error: function () {
+                        $('#errorModal').modal('show');
+                    }
+                });
+            });
+            // Save Order
+            $('#saveOrderBtn').click(function () {
+                event.preventDefault();
+                var orderData = new FormData($('#orderForm')[0]);
+                var method = $('#orderId').val() ? 'PUT' : 'POST';
+                console.log(method);
+                $.ajax({
+                    url: '/api/AOrder',
+                    type: method,
+                    dataType: 'json',
+                    data: orderData,
+                    contentType: false,
+                    processData: false,
+                    success: function () {
+                        $('#addEditOrderModal').modal('hide');
+                        $('#successModal').modal('show');
+                        getData();
+                    },
+                    error: function (error) {
+                        $('#addEditOrderModal').modal('hide');
+                        $('#errorModal').modal('show');
+                    }
+                });
+            });
+
+            $('#saveBillBtn').click(function () {
+                event.preventDefault();
+                var billData = new FormData($('#billForm')[0]);
+                $.ajax({
+                    url: '/api/ABill',
+                    type: 'PUT',
+                    dataType: 'json',
+                    data: billData,
+                    contentType: false,
+                    processData: false,
+                    success: function () {
+                        $('#editBillModal').modal('hide');
+                        $('#successModal').modal('show');
+                        
+                        window.location.href = "/Admin/Invoice?billId=@billId";
+
+                    },
+                    error: function (error) {
+                        $('#editBillModal').modal('hide');
+                        $('#errorModal').modal('show');
+                    }
+                });
+            });
+
+        });
+    </script>
+
+
+}
+

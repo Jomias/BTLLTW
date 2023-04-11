@@ -52,6 +52,7 @@ public partial class QlnhContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Data Source=LAPTOP-C6RJADBP;Initial Catalog=QLNH;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -74,7 +75,9 @@ public partial class QlnhContext : DbContext
                 .IsUnicode(false)
                 .HasDefaultValueSql("('admin')");
             entity.Property(e => e.DiscountPercentage).HasDefaultValueSql("((0))");
+            entity.Property(e => e.IsDeleted).HasDefaultValueSql("((0))");
             entity.Property(e => e.Note).HasMaxLength(100);
+            entity.Property(e => e.Status).HasDefaultValueSql("((0))");
             entity.Property(e => e.SubTotal)
                 .HasDefaultValueSql("((0))")
                 .HasColumnType("money");
@@ -88,11 +91,11 @@ public partial class QlnhContext : DbContext
 
             entity.HasOne(d => d.Payment).WithMany(p => p.Bills)
                 .HasForeignKey(d => d.PaymentId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Payment_Bill");
 
             entity.HasOne(d => d.Reservation).WithMany(p => p.Bills)
                 .HasForeignKey(d => d.ReservationId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Reservation_Bill");
 
             entity.HasOne(d => d.Table).WithMany(p => p.Bills)
@@ -354,7 +357,8 @@ public partial class QlnhContext : DbContext
                 .HasColumnType("datetime");
             entity.Property(e => e.CreatedBy)
                 .HasMaxLength(30)
-                .IsUnicode(false);
+                .IsUnicode(false)
+                .HasDefaultValueSql("('admin')");
             entity.Property(e => e.IsDeleted).HasDefaultValueSql("((0))");
             entity.Property(e => e.Note).HasMaxLength(50);
             entity.Property(e => e.Price).HasColumnType("money");
@@ -447,7 +451,6 @@ public partial class QlnhContext : DbContext
                 .IsUnicode(false)
                 .HasDefaultValueSql("('admin')");
             entity.Property(e => e.IsDeleted).HasDefaultValueSql("((0))");
-            entity.Property(e => e.Request).HasMaxLength(100);
             entity.Property(e => e.Status).HasDefaultValueSql("((0))");
             entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
             entity.Property(e => e.UpdatedBy)

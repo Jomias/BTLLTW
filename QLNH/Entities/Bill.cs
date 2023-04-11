@@ -19,11 +19,11 @@ public partial class Bill
 
     public DateTime? CheckOut { get; set; }
 
-    public long? ReservationId { get; set; }
+    public long ReservationId { get; set; }
 
     public long TableId { get; set; }
 
-    public long PaymentId { get; set; }
+    public long? PaymentId { get; set; }
 
     public string? CreatedBy { get; set; }
 
@@ -39,9 +39,9 @@ public partial class Bill
 
     public virtual ICollection<Order> Orders { get; } = new List<Order>();
 
-    public virtual Payment Payment { get; set; } = null!;
+    public virtual Payment? Payment { get; set; }
 
-    public virtual Reservation? Reservation { get; set; }
+    public virtual Reservation Reservation { get; set; } = null!;
 
     public virtual Table Table { get; set; } = null!;
 }

@@ -27,7 +27,6 @@
                         <div class="card-header">
                             <h4 class="card-title">Danh sách bàn</h4>
                             <button type="button" id="addTableBtn" class="btn btn-primary float-right" data-toggle="modal" data-target="#addEditTableModal">Add Table</button>
-
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -108,7 +107,6 @@
 
     <script type="text/javascript">
         function getData() {
-            // Fetch data using AJAX
             $.ajax({
                 url: "/api/ATable",
                 type: "GET",
@@ -208,6 +206,7 @@
                             success: function () {
                                 $('#successModal').modal('show');
                                 getData();
+
                             },
                             error: function (error) {
                                 $('#errorModal').modal('show');
@@ -231,6 +230,7 @@
                     success: function () {
                         $('#successModal').modal('show');
                         getData();
+
                     },
                     error: function () {
                         $('#errorModal').modal('show');
@@ -239,9 +239,9 @@
             });
             // Save Table
             $('#saveTableBtn').click(function () {
+                event.preventDefault();
                 var tableData = $('#tableForm').serialize();
                 var method = $('#tableId').val() ? 'PUT' : 'POST';
-                console.log(tableData);
                 $.ajax({
                     url: '/api/ATable/',
                     type: method,

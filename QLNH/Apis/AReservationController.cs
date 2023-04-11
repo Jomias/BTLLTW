@@ -32,18 +32,6 @@ namespace QLNH.Apis
 			}
 		}
 
-        [HttpGet("GetReservationByStatus")]
-        public async Task<IActionResult> GetReservationByStatusAll([FromQuery] int? status)
-        {
-            try
-            {
-                return Ok(await _reservationRepository.GetReservationByStatusAsync(status));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
         [HttpGet("{id}")]
 		public async Task<IActionResult> Get(long id)
 		{

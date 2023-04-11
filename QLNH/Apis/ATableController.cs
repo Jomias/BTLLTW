@@ -30,19 +30,19 @@ namespace QLNH.Apis
 				return BadRequest(ex.Message);
 			}
 		}
-
-        [HttpGet("GetTableByStatus")]
-        public async Task<IActionResult> GetTableByStatusAll([FromQuery] int? status)
+        [HttpGet("GetTableByCapacity")]
+        public async Task<IActionResult> GetTableByCapacity([FromQuery] int capacity)
         {
             try
             {
-                return Ok(await _tableRepository.GetTableByStatusAsync(status));
+                return Ok(await _tableRepository.GetTableByCapacityAsync(capacity));
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
+
 
         [HttpGet("{id}")]
 		public async Task<IActionResult> Get(long id)
