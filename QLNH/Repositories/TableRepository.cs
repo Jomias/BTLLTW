@@ -54,5 +54,13 @@ namespace QLNH.Repositories
 			_context.Tables!.Update(updateTable);
 			await _context.SaveChangesAsync();
 		}
-	}
+
+        public async Task<List<TableModel>> GetTableByStatusAsync(int? status)
+		{
+            var tables = await _context.Tables!
+				.Where(x => x.IsDeleted == false && (status == null || x.Status == status))
+				.OrderBy(x => x.Number).ToListAsync();
+            return _mapper.Map<List<TableModel>>(tables);
+        }
+    }
 }

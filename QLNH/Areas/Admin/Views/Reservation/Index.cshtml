@@ -1,0 +1,275 @@
+﻿@{
+    ViewData["Title"] = "Reservation";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles{
+    <link href="/Admin/vendor/datatables/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/Admin/vendor/pickadate/themes/default.css">
+    <link rel="stylesheet" href="/Admin/vendor/pickadate/themes/default.date.css">
+}
+<div class="content-body" style="min-height: 960px">
+    <div class="container-fluid">
+        <div class="row page-titles mx-0">
+            <div class="col-sm-6 p-md-0">
+                <div class="welcome-text">
+                    <h4>Hi, Welcome Back!</h4>
+                </div>
+            </div>
+            <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Quản lý bán</a></li>
+                    <li class="breadcrumb-item active"><a href="javascript:void(0)">Quản lý đặt bàn</a></li>
+                </ol>
+            </div>
+            <!-- row -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Danh sách đặt bàn</h4>
+                            <button type="button" id="addReservationBtn" class="btn btn-primary float-right" data-toggle="modal" data-target="#addEditReservationModal">Add Reservation</button>
+                        </div>
+                        <div class="card-body">
+                            <div class="reservation-responsive">
+                                <table id="data_reservation" class="display text-center" style="min-width: 845px">
+                                    <thead>
+                                        <tr>
+                                            <th>STT</th>
+                                            <th>Number</th>
+                                            <th>Capacity</th>
+                                            <th>Status</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="reservation_data">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add/Edit Reservation Modal -->
+        <div class="modal fade" id="addEditReservationModal" tabindex="-1" role="dialog" aria-labelledby="addEditReservationModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered " role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addEditReservationModalLabel">Add Reservation</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form id="reservationForm">
+                        <div class="modal-body">
+                            <input type="hidden" id="reservationId" name="id" value="">
+                            <div class="form-group">
+                                <label for="reservationGroupOf">Số người</label>
+                                <span class="text-danger"> *</span>
+                                <input type="number" class="form-control" id="reservationGroupOf" name="groupOf" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="reservationBookingDate">Thời gian đặt</label>
+                                <span class="text-danger"> *</span>
+                                <input type="datetime-local" name="bookingDate" class="form-control" id="reservationBookingDate">
+                            </div>
+                            <input type="hidden" id="reservationCreatedBy" name="createdBy">
+                            <input type="hidden" id="reservationCreatedAt" name="createdAt">
+                            <input type="hidden" id="reservationUpdatedBy" name="updatedBy">
+                            <input type="hidden" id="reservationUpdatedAt" name="updatedAt">
+                            <input type="hidden" id="reservationStatus" name="status">
+                            <input type="hidden" id="reservationIsDeleted" name="isDeleted">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" id="saveReservationBtn" class="btn btn-primary">Save Reservation</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Success modal -->
+        @await Html.PartialAsync("_SuccessModalPartial")
+
+        <!-- Error modal -->
+        @await Html.PartialAsync("_ErrorModalPartial")
+    </div>
+</div>
+
+
+
+@section Scripts{
+    <!-- Datareservation -->
+    <script src="/Admin/vendor/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="/Admin/js/plugins-init/datatables.init.js"></script>
+    <script type="text/javascript">
+        function getData() {
+            // Fetch data using AJAX
+            $.ajax({
+                url: "/api/AReservation",
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    $('#reservation_data').html('');
+                    $('#data_reservation').DataTable().clear().destroy();
+                    data.forEach(function (item, index) {
+                        let temp = `<span class="btn btn-sm light btn-warning">Pending</span>`
+                        if (item.Status === 1) {
+                            temp = `<span class="btn btn-sm light btn-primary">Accepted</span>`
+                        }
+                        if (item.Status === 2) {
+                            temp = `<span class="btn btn-sm light btn-info">Eating</span>`
+                        }
+                        if (item.Status === 3) {
+                            temp = `<span class="btn btn-sm light btn-success">Đã thanh toán</span>`
+                        }
+                        let row = `<tr>
+                                        <td>${index + 1}</td>
+                                        <td>${item.GroupOf}</td>
+                                        <td>${new Date(item.BookingDate).toLocaleString()}</td>
+                                        <td>${temp}</td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <button type="button" class="btn btn-success light sharp" data-toggle="dropdown">
+                                                    <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="5" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="19" cy="12" r="2"></circle></g></svg>
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    <a class="dropdown-item edit-reservation" data-id="${item.Id}" href="#">Edit</a>
+                                                    <a class="dropdown-item accept-reservation" data-id="${item.Id}" href="#" ${item.Status == 0 ? '' : 'hidden'}>Accept</a>
+                                                    <a class="dropdown-item eating-reservation" data-id="${item.Id}" href="#" ${item.Status == 1 ? '' : 'hidden'}>Create Bill</a>
+                                                    <a class="dropdown-item delete-reservation" data-id="${item.Id}" href="#">Delete</a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                   </tr>`;
+                        $('#reservation_data').append(row);
+                    });
+                    $('#data_reservation').DataTable();
+                },
+                error: function () {
+                },
+                complete: function () {
+                }
+            });
+        }
+
+        function ChangeStatus(reservationId, status) {
+            $.ajax({
+                url: '/api/AReservation/' + reservationId,
+                type: 'GET',
+                dataType: 'json',
+                success: function (reservation) {
+                    $('#reservationId').val(reservation.Id);
+                    $('#reservationBookingDate').val(reservation.BookingDate);
+                    $('#reservationGroupOf').val(reservation.GroupOf);
+                    $('#reservationCreatedBy').val(reservation.CreatedBy);
+                    $('#reservationCreatedAt').val(reservation.CreatedAt);
+                    $('#reservationUpdatedBy').val(reservation.UpdatedBy);
+                    $('#reservationUpdatedAt').val(reservation.UpdatedAt);
+                    $('#reservationStatus').val(status);
+                    $('#reservationIsDeleted').val(reservation.IsDeleted);
+                    var reservationData = $('#reservationForm').serialize();
+                    $.ajax({
+                        url: '/api/AReservation/',
+                        type: 'PUT',
+                        data: reservationData,
+                        dataType: 'json',
+                        success: function () {
+                            $('#successModal').modal('show');
+                            getData();
+                        },
+                        error: function (error) {
+                            $('#errorModal').modal('show');
+                        }
+                    });
+                },
+                error: function () {
+                    $('#errorModal').modal('show');
+                }
+            });
+
+        }
+        $(document).ready(function () {
+            $('#addReservationBtn').click(function () {
+                $('#addEditReservationModalLabel').text('Add Reservation');
+                $('#reservationForm')[0].reset();
+                $("input[type='hidden']").val('');
+            });
+            getData();
+            // Edit reservation click event
+            $('#data_reservation tbody').on('click', '.edit-reservation', function () {
+                $('#reservationForm')[0].reset();
+                var reservationId = $(this).data('id');
+                $.ajax({
+                    url: '/api/AReservation/' + reservationId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (reservation) {
+                        $('#addEditReservationModalLabel').text('Edit Reservation');
+                        $('#reservationId').val(reservation.Id);
+                        $('#reservationBookingDate').val(reservation.BookingDate);
+                        $('#reservationGroupOf').val(reservation.GroupOf);
+                        $('#reservationCreatedBy').val(reservation.CreatedBy);
+                        $('#reservationCreatedAt').val(reservation.CreatedAt);
+                        $('#reservationUpdatedBy').val(reservation.UpdatedBy);
+                        $('#reservationUpdatedAt').val(reservation.UpdatedAt);
+                        $('#reservationStatus').val(reservation.Status);
+                        $('#reservationIsDeleted').val(reservation.IsDeleted);
+                        $('#addEditReservationModal').modal('show');
+                    },
+                    error: function () {
+                        $('#errorModal').modal('show');
+                    }
+                });
+            });
+
+            $('#data_reservation tbody').on('click', '.accept-reservation', function () {
+                var reservationId = $(this).data('id');
+                ChangeStatus(reservationId, 1);
+            });
+
+            // Delete reservation click event
+            $('#data_reservation tbody').on('click', '.delete-reservation', function () {
+                var reservationId = $(this).data('id');
+                $.ajax({
+                    url: '/api/AReservation/' + reservationId,
+                    type: 'DELETE',
+                    dataType: 'json',
+                    success: function () {
+                        $('#successModal').modal('show');
+                        getData();
+                    },
+                    error: function () {
+                        $('#errorModal').modal('show');
+                    }
+                });
+            });
+            // Save Reservation
+            $('#saveReservationBtn').click(function () {
+                var reservationData = $('#reservationForm').serialize();
+                var method = $('#reservationId').val() ? 'PUT' : 'POST';
+                console.log(reservationData);
+                $.ajax({
+                    url: '/api/AReservation/',
+                    type: method,
+                    data: reservationData,
+                    dataType: 'json',
+                    success: function () {
+                        $('#addEditReservationModal').modal('hide');
+                        $('#successModal').modal('show');
+                        getData();
+                    },
+                    error: function (error) {
+                        $('#errorModal').modal('show'); 
+                    }
+                });
+            });
+        });
+    </script>
+
+}
+

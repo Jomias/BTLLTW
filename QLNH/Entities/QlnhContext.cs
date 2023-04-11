@@ -444,7 +444,8 @@ public partial class QlnhContext : DbContext
                 .HasColumnType("datetime");
             entity.Property(e => e.CreatedBy)
                 .HasMaxLength(30)
-                .IsUnicode(false);
+                .IsUnicode(false)
+                .HasDefaultValueSql("('admin')");
             entity.Property(e => e.IsDeleted).HasDefaultValueSql("((0))");
             entity.Property(e => e.Request).HasMaxLength(100);
             entity.Property(e => e.Status).HasDefaultValueSql("((0))");

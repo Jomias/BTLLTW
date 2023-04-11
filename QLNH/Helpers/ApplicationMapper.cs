@@ -20,7 +20,10 @@ namespace QLNH.Helpers
             CreateMap<MenuDish, MenuDishModel>().ReverseMap();
             CreateMap<Recipe, RecipeModel>().ReverseMap();
             CreateMap<Table, TableModel>().ReverseMap();
-
+            CreateMap<Reservation, ReservationModel>().ReverseMap();
+            CreateMap<Payment, PaymentModel>().ReverseMap();
+            CreateMap<Role, RoleModel>().ReverseMap();
+            CreateMap<Bill, BillModel>().ReverseMap();
         }
     }
 }

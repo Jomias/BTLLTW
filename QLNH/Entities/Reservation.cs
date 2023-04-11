@@ -13,7 +13,7 @@ public partial class Reservation
 
     public string? Request { get; set; }
 
-    public string CreatedBy { get; set; } = null!;
+    public string? CreatedBy { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 

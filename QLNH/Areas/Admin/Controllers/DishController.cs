@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using QLNH.Entities;
 using QLNH.Models;
 
@@ -68,6 +69,8 @@ namespace QLNH.Areas.Admin.Controllers
         public IActionResult Recipe(long dishId = 0)
         {
             ViewBag.dishId = dishId;
+            var name = _dbContext.Dishes.Find(dishId).Name;
+            ViewBag.Name = name;
             return View();
         }
         [HttpPost]

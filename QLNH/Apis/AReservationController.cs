@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using QLNH.Entities;
 using QLNH.Models;
+using QLNH.Repositories;
 using QLNH.Repositories.Interfaces;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -9,13 +10,13 @@ namespace QLNH.Apis
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class ATableController : ControllerBase
+	public class AReservationController : ControllerBase
 	{
-		private readonly ITableRepository _tableRepository;
+		private readonly IReservationRepository _reservationRepository;
 
-		public ATableController(ITableRepository tableRepository)
+		public AReservationController(IReservationRepository reservationRepository)
 		{
-			_tableRepository = tableRepository;
+			_reservationRepository = reservationRepository;
 		}
 
 		[HttpGet]
@@ -23,7 +24,7 @@ namespace QLNH.Apis
 		{
 			try
 			{
-				return Ok(await _tableRepository.GetAllAsync());
+				return Ok(await _reservationRepository.GetAllAsync());
 			}
 			catch (Exception ex)
 			{
@@ -31,28 +32,27 @@ namespace QLNH.Apis
 			}
 		}
 
-        [HttpGet("GetTableByStatus")]
-        public async Task<IActionResult> GetTableByStatusAll([FromQuery] int? status)
+        [HttpGet("GetReservationByStatus")]
+        public async Task<IActionResult> GetReservationByStatusAll([FromQuery] int? status)
         {
             try
             {
-                return Ok(await _tableRepository.GetTableByStatusAsync(status));
+                return Ok(await _reservationRepository.GetReservationByStatusAsync(status));
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
-
         [HttpGet("{id}")]
 		public async Task<IActionResult> Get(long id)
 		{
-			var table = await _tableRepository.GetAsync(id);
-			return table == null ? NotFound() : Ok(table);
+			var reservation = await _reservationRepository.GetAsync(id);
+			return reservation == null ? NotFound() : Ok(reservation);
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Post([FromForm] TableModel model)
+		public async Task<IActionResult> Post([FromForm] ReservationModel model)
 		{
 			if (!ModelState.IsValid) 
 			{
@@ -60,9 +60,9 @@ namespace QLNH.Apis
             }
 			try
 			{
-				var tableId = await _tableRepository.AddAsync(model);
-				var table = await _tableRepository.GetAsync(tableId);
-				return table == null ? NotFound() : Ok(table);
+				var reservationId = await _reservationRepository.AddAsync(model);
+				var reservation = await _reservationRepository.GetAsync(reservationId);
+				return reservation == null ? NotFound() : Ok(reservation);
 			}
 			catch (Exception ex)
 			{
@@ -71,7 +71,7 @@ namespace QLNH.Apis
 		}
 
 		[HttpPut]
-		public async Task<IActionResult> Put([FromForm] TableModel model)
+		public async Task<IActionResult> Put([FromForm] ReservationModel model)
 		{
             
             if (!ModelState.IsValid)
@@ -80,8 +80,8 @@ namespace QLNH.Apis
             }
             try
 			{
-				await _tableRepository.UpdateAsync(model);
-                return Ok(new TableModel());
+				await _reservationRepository.UpdateAsync(model);
+                return Ok(new ReservationModel());
 			}
 			catch (Exception ex)
 			{
@@ -94,8 +94,8 @@ namespace QLNH.Apis
 		{
             try
             {
-				await _tableRepository.DeleteAsync(id);
-				return Ok(new TableModel());
+				await _reservationRepository.DeleteAsync(id);
+				return Ok(new ReservationModel());
 			}
 			catch (Exception ex)
 			{

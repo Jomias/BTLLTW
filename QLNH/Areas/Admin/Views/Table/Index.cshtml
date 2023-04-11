@@ -37,6 +37,7 @@
                                             <th>STT</th>
                                             <th>Number</th>
                                             <th>Capacity</th>
+                                            <th>Status</th>
                                             <th></th>
                                         </tr>
                                     </thead>
@@ -116,10 +117,15 @@
                     $('#table_data').html('');
                     $('#data_table').DataTable().clear().destroy();
                     data.forEach(function (item, index) {
+                        let temp = `<span class="btn btn-sm light btn-success">Còn trống</span>`
+                        if (item.Status === 1) {
+                            temp = `<span class="btn btn-sm light btn-warning">Có người</span>`
+                        }
                         let row = `<tr>
                                         <td>${index + 1}</td>
                                         <td>${item.Number}</td>
                                         <td>${item.Capacity}</td>
+                                        <td>${temp}</td>
                                         <td>
                                             <div class="dropdown">
                                                 <button type="button" class="btn btn-success light sharp" data-toggle="dropdown">
@@ -127,6 +133,7 @@
                                                 </button>
                                                 <div class="dropdown-menu">
                                                     <a class="dropdown-item edit-table" data-id="${item.Id}" href="#">Edit</a>
+                                                    <a class="dropdown-item status-table" data-id="${item.Id}" href="#">Change Status</a>
                                                     <a class="dropdown-item delete-table" data-id="${item.Id}" href="#">Delete</a>
                                                 </div>
                                             </div>
@@ -153,7 +160,6 @@
             $('#data_table tbody').on('click', '.edit-table', function () {
                 $('#tableForm')[0].reset();
                 var tableId = $(this).data('id');
-                console.log(tableId);
                 $.ajax({
                     url: '/api/ATable/' + tableId,
                     type: 'GET',
@@ -176,6 +182,45 @@
                     }
                 });
             });
+
+            $('#data_table tbody').on('click', '.status-table', function (){ 
+                var tableId = $(this).data('id');
+                $.ajax({
+                    url: '/api/ATable/' + tableId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (table) {
+                        $('#tableId').val(table.Id);
+                        $('#tableNumber').val(table.Number);
+                        $('#tableCapacity').val(table.Capacity);
+                        $('#tableCreatedBy').val(table.CreatedBy);
+                        $('#tableCreatedAt').val(table.CreatedAt);
+                        $('#tableUpdatedBy').val(table.UpdatedBy);
+                        $('#tableUpdatedAt').val(table.UpdatedAt);
+                        $('#tableStatus').val(1 - table.Status);
+                        $('#tableIsDeleted').val(table.IsDeleted);
+                        var tableData = $('#tableForm').serialize();
+                        $.ajax({
+                            url: '/api/ATable/',
+                            type: 'PUT',
+                            data: tableData,
+                            dataType: 'json',
+                            success: function () {
+                                $('#successModal').modal('show');
+                                getData();
+                            },
+                            error: function (error) {
+                                $('#errorModal').modal('show');
+                            }
+                        });
+                    },
+                    error: function () {
+                        $('#errorModal').modal('show');
+                    }
+                });
+
+            });
+
             // Delete table click event
             $('#data_table tbody').on('click', '.delete-table', function () {
                 var tableId = $(this).data('id');
