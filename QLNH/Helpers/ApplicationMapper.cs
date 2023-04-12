@@ -26,7 +26,9 @@ namespace QLNH.Helpers
             CreateMap<Bill, BillModel>().ReverseMap();
             CreateMap<Order, OrderModel>().ReverseMap();
 			CreateMap<User, UserModel>().ReverseMap();
+            CreateMap<ReservationDish, ReservationDishModel>().ReverseMap();
 
-		}
-	}
+
+        }
+    }
 }

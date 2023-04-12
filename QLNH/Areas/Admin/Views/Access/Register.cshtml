@@ -1,0 +1,83 @@
+﻿@{
+    Layout = null;
+}
+@using QLNH.Entities;
+
+@model User
+
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Eatio - Restaurant Food Order Bootstrap Admin Dashboard</title>
+    <!-- Favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="/Admin/images/favicon.png">
+    <link href="/Admin/css/style.css" rel="stylesheet">
+
+</head>
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+<body class="h-100">
+    <div class="authincation h-100">
+        <div class="container h-100">
+            <div class="row justify-content-center h-100 align-items-center">
+                <div class="col-md-6">
+                    <div class="authincation-content">
+                        <div class="row no-gutters">
+                            <div class="col-xl-12">
+                                <div class="auth-form">
+                                    <h4 class="text-center mb-4">Sign up your account</h4>
+                                    @using (Html.BeginForm("Register", "Access", new { area = "Admin" }, FormMethod.Post))
+                                    {
+                                        <div class="form-group">
+                                            <label class="mb-1"><strong>Username</strong></label>
+                                            <input type="text" class="form-control" name="Username">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="mb-1"><strong>Password</strong></label>
+                                            <input type="password" class="form-control" name="Password">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="mb-1"><strong>Email</strong></label>
+                                            <input type="email" class="form-control" name="Email">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="mb-1"><strong>Phone</strong></label>
+                                            <input type="text" class="form-control" name="Phone">
+                                        </div>
+                                        <input type="hidden" value="1" name="RoleId">
+                                        <div class="text-center mt-4">
+                                            <button type="submit" class="btn btn-primary btn-block">Sign me up</button>
+                                        </div>
+                                    }
+                                    <div class="new-account mt-3">
+                                        <p>Already have an account? <a class="text-primary" asp-action="Login" asp-controller="Access">Sign in</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--**********************************
+        Scripts
+    ***********************************-->
+    <!-- Required vendors -->
+    <script src="/Admin/vendor/global/global.min.js"></script>
+    <script src="/Admin/vendor/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
+    <script src="/Admin/js/custom.min.js"></script>
+    <script src="/Admin/js/deznav-init.js"></script>
+
+</body>
+</html>

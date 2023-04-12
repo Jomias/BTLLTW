@@ -3,102 +3,106 @@ using Microsoft.AspNetCore.Mvc;
 using QLNH.Entities;
 using QLNH.Models;
 
-namespace QLNH.Controllers
+namespace QLNH.Areas.Controllers
 {
-    public class AccessController : Controller
-    {
+	[Area("Admin")]
+	public class AccessController : Controller
+	{
 
-        QlnhContext db = new QlnhContext();
-        private readonly IMapper _mapper;
-        public AccessController(IMapper mapper)
-        {
-            _mapper = mapper;
-        }
-        [HttpGet]
-        public IActionResult Login()
-        {
-            if (HttpContext.Session.GetString("Username") == null)
-            {
-                return View();
-            }
-            else
-            {
-                if (HttpContext.Session.GetInt32("RoleId") == 3)
-                {
-                    return RedirectToAction("Index", "Home");
-                }
-                else
-                {
-                    return RedirectToAction("Index", "Admin/Home");
-                }
-            }
-        }
+		QlnhContext db = new QlnhContext();
+		private readonly IMapper _mapper;
+		public AccessController(IMapper mapper)
+		{
+			_mapper = mapper;
+		}
+		[HttpGet]
+		public IActionResult Login()
+		{
+			if (HttpContext.Session.GetString("Username") == null)
+			{
+				return View();
+			}
+			else
+			{
+				if (HttpContext.Session.GetInt32("RoleId") == 1)
+				{
+					return RedirectToAction("Index", "Home");
+				}
+				else
+				{
+					HttpContext.Session.Clear();
+					HttpContext.Session.Remove("Username");
+					return StatusCode(403);
+				}
+			}
+		}
 
-        [HttpPost]
-        public IActionResult Login(User user)
-        {
-            var u = db.Users.FirstOrDefault(x => x.Username == user.Username && x.Password == user.Password);
-            if(u != null && u.IsDeleted==true)
-            {
-                TempData["Error"] = "Tài khoản đã bị khóa";
-                return RedirectToAction("Login");
-            }
-            else
-            {
-                if (u == null)
-                {
-                    TempData["Error"] = "Tên đăng nhập hoặc mật khẩu không đúng";
-                    return RedirectToAction("Login");
-                    
-                }
-                else
-                {
-                    if (u.RoleId == 2)
-                    {
-                        HttpContext.Session.SetString("Username", u.Username);
-                        return RedirectToAction("Index", "Home");
-                    }
-                    else
-                    {
-                        HttpContext.Session.SetString("Username", u.Username);
-                        return RedirectToAction("Index", "Home", new { area = "Admin" });
-                    }
-                }
-            }
-            
-        }
-        [Route("Register")]
 
-        [HttpGet]
-        public IActionResult Register()
-        {
-            return View();
-        }
+		[HttpPost]
+		public IActionResult Login(User user)
+		{
+			var u = db.Users.FirstOrDefault(x => x.Username == user.Username && x.Password == user.Password);
+			if (u != null && u.IsDeleted == true)
+			{
+				TempData["Error"] = "Tài khoản đã bị khóa";
+				return RedirectToAction("Login");
+			}
+			else
+			{
+				if (u == null)
+				{
+					TempData["Error"] = "Tên đăng nhập hoặc mật khẩu không đúng";
+					return RedirectToAction("Login");
 
-        //POST: Register
-        [Route("Register")]
+				}
+				else
+				{
+					if (u.RoleId == 1)
+					{
+						HttpContext.Session.SetString("Username", u.Username);
+						return RedirectToAction("Index", "Home");
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-       
-        public IActionResult Register(UserModel user)
-        {
-            var entity = _mapper.Map<User>(user);
-            if (ModelState.IsValid)
-            {
-                db.Users.Add(entity);
-                db.SaveChanges();
-                TempData["Success"] = "Đăng kí thành công";
-                return RedirectToAction("Login", "Access");
-            }
-            TempData["Error"] = "Lỗi";
-            return BadRequest(ModelState);
-        }
-        public IActionResult Logout()
-        {
-            HttpContext.Session.Clear();
-            HttpContext.Session.Remove("Username");
-            return RedirectToAction("Login", "Access");
-        }
-    }
+					}
+					else
+					{
+						HttpContext.Session.Clear();
+						HttpContext.Session.Remove("Username");
+						return StatusCode(403);
+					}
+				}
+			}
+
+		}
+
+		[HttpGet]
+		public IActionResult Register()
+		{
+			return View();
+		}
+
+		//POST: Register
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+
+		public IActionResult Register(UserModel user)
+		{
+			var entity = _mapper.Map<User>(user);
+			if (ModelState.IsValid)
+			{
+				db.Users.Add(entity);
+				db.SaveChanges();
+				TempData["Success"] = "Đăng kí thành công";
+				return RedirectToAction("Login", "Access");
+			}
+			TempData["Error"] = "Lỗi";
+			return BadRequest(ModelState);
+		}
+		public IActionResult Logout()
+		{
+			HttpContext.Session.Clear();
+			HttpContext.Session.Remove("Username");
+			return RedirectToAction("Login", "Access");
+		}
+	}
 }

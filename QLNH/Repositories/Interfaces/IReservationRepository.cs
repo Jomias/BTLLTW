@@ -9,5 +9,7 @@ namespace QLNH.Repositories.Interfaces
 		public Task UpdateAsync(ReservationModel model);
 		public Task DeleteAsync(long id);
 		public Task<List<ReservationModel>> GetAllAsync();
-    }
+		public Task<List<ReservationModel>> GetReservationByUsername(string Username);
+
+	}
 }

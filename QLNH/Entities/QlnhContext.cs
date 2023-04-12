@@ -45,6 +45,8 @@ public partial class QlnhContext : DbContext
 
     public virtual DbSet<Reservation> Reservations { get; set; }
 
+    public virtual DbSet<ReservationDish> ReservationDishes { get; set; }
+
     public virtual DbSet<Role> Roles { get; set; }
 
     public virtual DbSet<Table> Tables { get; set; }
@@ -52,7 +54,6 @@ public partial class QlnhContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Data Source=LAPTOP-C6RJADBP;Initial Catalog=QLNH;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -456,6 +457,35 @@ public partial class QlnhContext : DbContext
             entity.Property(e => e.UpdatedBy)
                 .HasMaxLength(30)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<ReservationDish>(entity =>
+        {
+            entity.ToTable("Reservation_Dish");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.CreatedBy)
+                .HasMaxLength(30)
+                .IsUnicode(false)
+                .HasDefaultValueSql("('admin')");
+            entity.Property(e => e.IsDeleted).HasDefaultValueSql("((0))");
+            entity.Property(e => e.Status).HasDefaultValueSql("((0))");
+            entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
+            entity.Property(e => e.UpdatedBy)
+                .HasMaxLength(30)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.Dish).WithMany(p => p.ReservationDishes)
+                .HasForeignKey(d => d.DishId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Dish_Reservation_Dish");
+
+            entity.HasOne(d => d.Reservation).WithMany(p => p.ReservationDishes)
+                .HasForeignKey(d => d.ReservationId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Reservation_Reservation_Dish");
         });
 
         modelBuilder.Entity<Role>(entity =>

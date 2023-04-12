@@ -3,13 +3,15 @@ using System.Collections.Generic;
 
 namespace QLNH.Entities;
 
-public partial class Reservation
+public partial class ReservationDish
 {
     public long Id { get; set; }
 
-    public int GroupOf { get; set; }
+    public long DishId { get; set; }
 
-    public DateTime BookingDate { get; set; }
+    public long ReservationId { get; set; }
+
+    public int? Quantity { get; set; }
 
     public string? CreatedBy { get; set; }
 
@@ -23,7 +25,7 @@ public partial class Reservation
 
     public bool? IsDeleted { get; set; }
 
-    public virtual ICollection<Bill> Bills { get; } = new List<Bill>();
+    public virtual Dish Dish { get; set; } = null!;
 
-    public virtual ICollection<ReservationDish> ReservationDishes { get; } = new List<ReservationDish>();
+    public virtual Reservation Reservation { get; set; } = null!;
 }

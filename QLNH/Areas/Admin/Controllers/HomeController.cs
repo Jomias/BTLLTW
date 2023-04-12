@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QLNH.Entities;
+using QLNH.Models.Authentication;
 
 namespace QLNH.Areas.Admin.Controllers
 {

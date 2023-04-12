@@ -37,6 +37,7 @@ builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IBillRepository, BillRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IReservationDishRepository, ReservationDishRepository>();
 
 builder.Services.AddScoped<IFileStorageService, InAppStorageService>();
 builder.Services.AddHttpContextAccessor();
@@ -63,7 +64,21 @@ app.UseSession();
 //app.MapControllerRoute(
 //    name: "default",
 //    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.Use(async (context, next) =>
+{
+    var username = context.Session.GetString("Username");
+    var roleId = context.Session.GetInt32("RoleId");
 
+    if (context.Request.Path.Value.StartsWith("/admin") &&
+        context.Request.Path.Value != "/admin/access/login" &&
+        (string.IsNullOrEmpty(username) || roleId != 1))
+    {
+        context.Response.Redirect("/admin/access/login");
+        return;
+    }
+
+    await next();
+});
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllerRoute(
@@ -74,4 +89,5 @@ app.UseEndpoints(endpoints =>
       name: "default",
       pattern: "{controller=Home}/{action=Index}/{id?}");
 });
+
 app.Run();

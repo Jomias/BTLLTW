@@ -19,6 +19,18 @@ namespace QLNH.Apis
 			_reservationRepository = reservationRepository;
 		}
 
+		[HttpGet("GetReservationByUsername")]
+		public async Task<IActionResult> GetReservationByUsername(string Username)
+		{
+			try
+			{
+				return Ok(await _reservationRepository.GetReservationByUsername(Username));
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+		}
 		[HttpGet]
 		public async Task<IActionResult> GetAll()
 		{

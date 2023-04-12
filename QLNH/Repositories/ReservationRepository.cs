@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using QLNH.Entities;
 using QLNH.Models;
+using QLNH.Models.ViewModels;
 using QLNH.Repositories.Interfaces;
 using System.Net.WebSockets;
 
@@ -72,6 +73,23 @@ namespace QLNH.Repositories
 			_context.Reservations!.Update(updateReservation);
 			await _context.SaveChangesAsync();
 		}
-    }
+		public async Task<List<ReservationModel>> GetReservationByUsername(string Username)
+		{
+			return await _context.Reservations
+				.Where(x => String.IsNullOrEmpty(Username) || x.CreatedBy == Username)
+				.Select(x => new ReservationModel()
+				{
+					Id = x.Id,
+					GroupOf = x.GroupOf,
+					BookingDate = x.BookingDate,
+					CreatedBy = x.CreatedBy,
+					UpdatedBy = x.UpdatedBy,
+					CreatedAt = x.CreatedAt,
+					IsDeleted = x.IsDeleted,
+				}).ToListAsync();
+		}
+
+
+	}
 
 }

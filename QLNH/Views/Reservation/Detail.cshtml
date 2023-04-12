@@ -1,0 +1,256 @@
+﻿@{
+    ViewData["Title"] = "Reservation Dish";
+    var reservationId = (long)ViewBag.reservationId;
+}
+
+@section Styles{
+    <link href="/Admin/vendor/datatables/css/jquery.dataTables.min.css" rel="stylesheet">
+}
+<div class="content-body" style="min-height: 960px">
+    <div class="container-fluid">
+        <div class="row page-titles mx-0">
+            <div class="col-sm-6 p-md-0">
+                <div class="welcome-text">
+                    <h4>Hi, Welcome Back!</h4>
+                </div>
+            </div>
+            <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Quản lý Đặt/a></li>
+                    <li class="breadcrumb-item active"><a href="javascript:void(0)">Công thức Đặt</a></li>
+                </ol>
+            </div>
+
+            <!-- row -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">@reservationId</h4>
+                            <button type="button" id="addReservationDishBtn" class="btn btn-primary float-right" data-toggle="modal" data-target="#addEditReservationDishModal">Add ReservationDish</button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table id="data_table" class="display text-center" style="min-width: 845px">
+                                    <thead>
+                                        <tr>
+                                            <th>STT</th>
+                                            <th>Dish</th>
+                                            <th>Quantity</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="reservationDish_data">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="addEditReservationDishModal" tabindex="-1" role="dialog" aria-labelledby="addEditReservationDishModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered " role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addEditReservationDishModalLabel">Add ReservationDish</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form id="reservationDishForm">
+                        <div class="modal-body">
+                            <input type="hidden" id="reservationDishId" name="Id" value="">
+                            <input type="hidden" id="reservationDishCreatedBy" name="CreatedBy">
+                            <input type="hidden" id="reservationDishCreatedAt" name="CreatedAt">
+                            <input type="hidden" id="reservationDishUpdatedBy" name="UpdatedBy">
+                            <input type="hidden" id="reservationDishUpdatedAt" name="UpdatedAt">
+                            <input type="hidden" id="reservationDishStatus" name="Status">
+                            <input type="hidden" id="reservationDishIsDeleted" name="IsDeleted">
+                            <div class="form-group">
+                                <label for="reservationDishReservationId" class="control-label">Mã đặt</label>
+                                <span class="text-danger">*</span>
+                                <input id="reservationDishReservationId" class="form-control" name="ReservationId" readonly />
+                            </div>
+                            <div class="form-group">
+                                <label for="dishOption">Món ăn</label>
+                                <span class="text-danger">*</span>
+                                <select id="dishOption" name="DishId" class="form-control"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="reservationDishQuantity">Số lượng</label>
+                                <span class="text-danger">*</span>
+                                <input type="number" min="0" class="form-control" id="reservationDishQuantity" name="Quantity" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" id="saveReservationDishBtn" class="btn btn-primary">Save ReservationDish</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success modal -->
+        @await Html.PartialAsync("_SuccessModalPartial")
+
+        <!-- Error modal -->
+        @await Html.PartialAsync("_ErrorModalPartial")
+    </div>
+</div>
+
+@section Scripts{
+    <!-- Datatable -->
+    <script src="/Admin/vendor/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="/Admin/js/plugins-init/datatables.init.js"></script>
+
+    <script type="text/javascript">
+        function getData() {
+            let url = "/api/AReservationDish/GetAllReservationDishViewModel?DishId=" + @reservationId;
+
+            $.ajax({
+                url: url,
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    $('#reservationDish_data').html('');
+                    $('#data_table').DataTable().clear().destroy();
+                    data.forEach(function (item, index) {
+                        let row = `<tr>
+                                                                <td>${index + 1}</td>
+                                                                <td>${item.Dish}</td>
+                                                                <td>${item.Quantity}</td>
+                                                                <td>
+                                                                    <div class="dropdown">
+                                                                        <button type="button" class="btn btn-success light sharp" data-toggle="dropdown">
+                                                                            <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="5" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="19" cy="12" r="2"></circle></g></svg>
+                                                                        </button>
+                                                                        <div class="dropdown-menu">
+                                                                            <a class="dropdown-item edit-reservationDish" data-id="${item.Id}" href="#">Edit</a>
+                                                                            <a class="dropdown-item delete-reservationDish" data-id="${item.Id}" href="#">Delete</a>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                          </tr>`;
+                        $('#reservationDish_data').append(row);
+                    });
+                    $('#data_table').DataTable();
+                },
+                error: function () {
+                },
+                complete: function () {
+                }
+            });
+        }
+        function modalReservationDishListDish(DishId = null) {
+            $.ajax({
+                type: 'GET',
+                url: '/api/ADish',
+                dataType: 'json',
+                success: function (dishs) {
+                    $('#dishOption').html('');
+                    var select = $('#dishOption');
+                    $.each(dishs, function (i, dish) {
+                        let row = `<option value="${dish.Id}">${dish.Name}</option>`;
+                        if ((i === 0 && DishId === null) || DishId === dish.Id) {
+                            row = `<option value="${dish.Id}" selected>${dish.Name}</option>`;
+                        }
+                        select.append(row);
+                    });
+                    select.selectpicker('refresh');
+                },
+                error: function (xhr, status, error) {
+                    console.log(error);
+                }
+            });
+        }
+        $(document).ready(function () {
+            $('#dishOption').on('change', function () {
+                var selectedDishId = $(this).val();
+                $('#reservationDishForm input[name="ReservationId"]').val(selectedDishId);
+            });
+            $('#addReservationDishBtn').click(function () {
+                $('#addEditReservationDishModalLabel').text('Add ReservationDish');
+                $('#reservationDishForm')[0].reset();
+                $("input[type='hidden']").val('');
+                $("input[name='ReservationId']").val('@reservationId');
+                modalReservationDishListDish();
+            });
+            getData();
+            // Edit reservationDish click event
+            $('#data_table tbody').on('click', '.edit-reservationDish', function () {
+                $('#reservationDishForm')[0].reset();
+                var reservationDishId = $(this).data('id');
+                $.ajax({
+                    url: '/api/AReservationDish/' + reservationDishId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (reservationDish) {
+                        $('#addEditReservationDishModalLabel').text('Edit ReservationDish');
+                        $('#reservationDishId').val(reservationDish.Id);
+                        $('#reservationDishQuantity').val(reservationDish.Quantity);
+                        $('#reservationDishCreatedBy').val(reservationDish.CreatedBy);
+                        $('#reservationDishUpdatedBy').val(reservationDish.UpdatedBy);
+                        $('#reservationDishCreatedAt').val(reservationDish.CreatedAt);
+                        $('#reservationDishUpdatedAt').val(reservationDish.UpdatedAt);
+                        $('#reservationDishStatus').val(reservationDish.Status);
+                        $('#reservationDishIsDeleted').val(reservationDish.IsDeleted);
+                        $('#reservationDishDishId').val(reservationDish.DishId);
+                        modalReservationDishListDish(reservationDish.DishId);
+
+                        $('#addEditReservationDishModal').modal('show');
+
+                    },
+                    error: function () {
+                        $('#errorModal').modal('show');
+                    }
+                });
+            });
+            // Delete reservationDish click event
+            $('#data_table tbody').on('click', '.delete-reservationDish', function () {
+                var reservationDishId = $(this).data('id');
+                $.ajax({
+                    url: '/api/AReservationDish/' + reservationDishId,
+                    type: 'DELETE',
+                    dataType: 'json',
+                    success: function () {
+                        $('#successModal').modal('show');
+                        getData();
+                    },
+                    error: function () {
+                        $('#errorModal').modal('show');
+                    }
+                });
+            });
+            // Save ReservationDish
+            $('#saveReservationDishBtn').click(function () {
+                event.preventDefault();
+                var reservationDishData = new FormData($('#reservationDishForm')[0]);
+                var method = $('#reservationDishId').val() ? 'PUT' : 'POST';
+                console.log(method);
+                $.ajax({
+                    url: '/api/AReservationDish',
+                    type: method,
+                    dataType: 'json',
+                    data: reservationDishData,
+                    contentType: false,
+                    processData: false,
+                    success: function () {
+                        $('#addEditReservationDishModal').modal('hide');
+                        $('#successModal').modal('show');
+                        getData();
+                    },
+                    error: function (error) {
+                        $('#addEditReservationDishModal').modal('hide');
+                        $('#errorModal').modal('show');
+                    }
+                });
+            });
+        });
+    </script>
+
+
+}
+

@@ -40,4 +40,6 @@ public partial class Dish
     public virtual ICollection<Order> Orders { get; } = new List<Order>();
 
     public virtual ICollection<Recipe> Recipes { get; } = new List<Recipe>();
+
+    public virtual ICollection<ReservationDish> ReservationDishes { get; } = new List<ReservationDish>();
 }
